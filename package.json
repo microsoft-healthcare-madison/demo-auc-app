@@ -4,7 +4,7 @@
   "description": "A demo AUC consultation app.",
   "main": "index.js",
   "scripts": {
-    "demo": "nodemon ./login.js",
+    "demo": "nodemon ./index.js",
     "launch": "http-server -p 8899 -c-1",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

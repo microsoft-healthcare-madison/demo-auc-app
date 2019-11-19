@@ -3,7 +3,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const port = process.env.PORT || '3002';
-const login = `<a href="http://localhost:${port}/">login</a>`;
 
 const CPT = {
   _FHIR_CODING_SYSTEM: 'http://www.ama-assn.org/go/cpt',
