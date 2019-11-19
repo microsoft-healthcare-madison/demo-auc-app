@@ -9,21 +9,22 @@
 <body>
   <div>
     <form action="evaluate" method="POST">
+      <input type="hidden" id="provider" name="provider">
       <table>
         <caption>Enter Patient Demographics</caption>
         <tr>
           <th><label for="gender">Gender</label></th>
           <td>
             <select name="gender" required>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
+              <option id="male" value="male">Male</option>
+              <option id="female" value="female">Female</option>
+              <option id="other" value="other">Other</option>
             </select>
           </td>
         </tr>
         <tr>
           <th><label for="age">Age</label></th>
-          <td><input name="age" required></td>
+          <td><input id="age" name="age" required></td>
         </tr>
         <tr>
           <th><label for="indication">Indication</label></th>
@@ -41,7 +42,7 @@
         <tr>
           <th><label for="procedure">Procedure</label></th>
           <td>
-            <input list="procedures" name="procedure">
+            <input list="procedures" name="procedure" required>
             <datalist id="procedures">
               <option value="75561">cardiac mri</option>
               <option value="70450">ct scan - no contrast material</option>
@@ -55,6 +56,37 @@
       <input type="submit">
     </form>
   </div>
+
+  <script src="node_modules/fhirclient/build/fhir-client.js"></script>
+  <script>
+    async function getContext(client) {
+      return {
+        patient: await client.patient.read(),
+        user: await client.user.read(),
+      };
+    }
+
+    function populateForm(context) {
+      const patient = context.patient;
+      const then = new Date(patient.birthDate),
+        now = new Date();
+      const msPerYear = 365.25 * 24 * 60 * 60 * 1000;
+      const age = (now.getTime() - then.getTime()) / msPerYear;
+
+      document.getElementById('provider').value = context.user.id;
+      document.getElementById('age').value = Math.round(age);
+      document.getElementById(patient.gender).setAttribute('selected', 1);
+    }
+
+    if (typeof FHIR !== 'undefined') {
+      FHIR.oauth2.ready()
+        .then(getContext)
+        .then(populateForm)
+        .catch(console.error);
+    }
+  </script>
+
+
 </body>
 
 </html>
