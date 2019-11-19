@@ -2,13 +2,30 @@
 A demonstration SMART app that serves AUC external guidance for PAMA.
 
 Instructions
-------------
+============
 
 ```sh
 npm install
-npm run launch &
-npm run demo
+npm run all
 ```
+
+CDS Hooks Sandbox
+_________________
+
+<img src="./images/v3_pama_tab.png" width="512">
+
+To launch the app via the CDS Hooks Sanbox, [click here](https://sandbox.cds-hooks.org) and configure the `demo-auc-app` service if it isn't already listed in the `PAMA Imaging` tab.
+
+<img src="./images/v3_pama_tab_new_service.png" width="256">
+<img src="./images/v3_discovery_endpoint.png" width="256">
+<img src="./images/v3_select_service.png" width="256">
+<img src="./images/v3_pama_imaging_tab.png" width="256">
+<img src="./images/v3_pama_tab_messages.png" width="256">
+<img src="./images/v3_select_hook.png" width="256">
+
+
+SMART App Launcher
+__________________
 
 To launch the app via SMART launch, [click here](http://launch.smarthealthit.org/?auth_error=&fhir_version_1=r4&fhir_version_2=r4&iss=&launch_ehr=1&launch_url=http%3A%2F%2Flocalhost%3A8899%2Flaunch.html&patient=&prov_skip_auth=1&provider=&pt_skip_auth=1&public_key=&sb=&sde=&sim_ehr=1&token_lifetime=15&user_pt=) and then click the green Launch App button.
 
