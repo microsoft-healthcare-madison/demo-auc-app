@@ -6,17 +6,23 @@ Instructions
 
 ```sh
 npm install
+npm run launch &
 npm run demo
 ```
 
-Visit http://localhost:3001/ to log in (use any username and password)
+To launch the app via SMART launch, [click here](http://launch.smarthealthit.org/?auth_error=&fhir_version_1=r4&fhir_version_2=r4&iss=&launch_ehr=1&launch_url=http%3A%2F%2Flocalhost%3A8899%2Flaunch.html&patient=&prov_skip_auth=1&provider=&pt_skip_auth=1&public_key=&sb=&sde=&sim_ehr=1&token_lifetime=15&user_pt=) and then click the green Launch App button.
 
-<img src="./images/login.png" alt="alt text" width="256">
+<img src="./images/v2launch.png" alt="alt text" width="256">
 
-Select a patient age, gender, indication, and order to determine whether it
-is within recommended guidelines.
 
-<img src="./images/empty_form.png" alt="alt text" width="256">
+Select a provider and a patient, then select an indication, and an order to 
+determine whether it is within recommended guidelines.
+
+<img src="./images/v2provider.png" alt="alt text" width="256">
+<img src="./images/v2patient.png" alt="alt text" width="256">
+<img src="./images/v2indication.png" alt="alt text" width="256">
+<img src="./images/v2procedure.png" alt="alt text" width="256">
+<img src="./images/v2rating.png" alt="alt text" width="256">
 
 V2 TODO
 -------
