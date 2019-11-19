@@ -24,6 +24,15 @@ determine whether it is within recommended guidelines.
 <img src="./images/v2procedure.png" alt="alt text" width="256">
 <img src="./images/v2rating.png" alt="alt text" width="256">
 
+V3 TODO
+-------
+
+- [ ] Make a CDS Hook Service to *always* launch a SMART card for draft orders
+  - [x] Refactor the AUC logic into a module, enabling use in the hook too.
+  - [ ] Write a new CDS Hook server to be run with npm
+- [ ] Enable the form to read the draft order from the fhir client
+- [ ] Enable writes to the form to update the draft order in the EHR
+
 V2 TODO
 -------
 
