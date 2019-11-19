@@ -1,21 +1,12 @@
-# smart-auc-demo
-A demonstration SMART app that serves AUC external guidance for PAMA.
+<!DOCTYPE html>
+<html>
 
-Instructions
-------------
+<head>
+  <meta charset="utf-8">
+  <title>Demo AUC Guidance App</title>
+</head>
 
-```sh
-npm install
-npm run demo
-```
-
-Visit http://localhost:3001/ to log in (use any username and password)
-
-<img src="./images/login.png" alt="alt text" width="256">
-
-Select a patient age, gender, indication, and order to determine whether it
-is within recommended guidelines.
-
+<body>
   <div>
     <form action="evaluate" method="POST">
       <table>
@@ -64,13 +55,6 @@ is within recommended guidelines.
       <input type="submit">
     </form>
   </div>
+</body>
 
-V1 TODO
--------
-
-- [x] Mock a simple UI on paper / in Visio
-- [x] Create a static page form to serve as the starting point
-  - [x] Fake sign-in
-  - [x] Enter Demographics (age and gender)
-  - [x] Select a condition
-  - [x] Select an appropriate imaging procedure
+</html>
