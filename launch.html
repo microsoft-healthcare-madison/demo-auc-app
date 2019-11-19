@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="./node_modules/fhirclient/build/fhir-client.js"></script>
+    <script>
+    FHIR.oauth2.authorize({
+      client_id: "demo_auc_guideline_consultation_app",
+      scope: "patient/*.read openid profile"
+    });
+    </script>
+  </head>
+  <body>Loading...</body>
+</html>

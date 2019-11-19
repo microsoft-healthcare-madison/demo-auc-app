@@ -1,10 +1,8 @@
 "use strict";
 const express = require('express');
-const session = require('express-session');
 const bodyParser = require('body-parser');
 const path = require('path');
-const port = process.env.PORT || '3001';
-const login = `<a href="http://localhost:${port}/">login</a>`;
+const port = process.env.PORT || '3002';
 
 const CPT = {
   _FHIR_CODING_SYSTEM: 'http://www.ama-assn.org/go/cpt',
@@ -63,52 +61,20 @@ const cptReasons = {
 };
 
 const app = express();
-app.use(session({
-  secret: 'secret',
-  resave: true,
-  saveUninitialized: true
-}));
 app.use(bodyParser.urlencoded({extended : true}));
 app.use(bodyParser.json());
-
 app.get('/', function(request, response) {
-  if (request.session.loggedin) {
-    response.redirect('/consult');
-  } else {
-    response.sendFile(path.join(__dirname + '/login.html'));
-  }
+  response.redirect('/consult');
 });
 
 app.get('/consult', function(request, response) {
-  if (request.session.loggedin) {
-    response.sendFile(path.join(__dirname + '/index.html'));
-  } else {
-    response.send(`Please ${login} to view this page!`).end();
-  }
+  response.sendFile(path.join(__dirname + '/index.html'));
 });
 
 app.post('/evaluate', function(request, response) {
-  if (!request.session.loggedin) {
-    response.status(404).send(`You must ${login} to access this.`);
-  } else {
-    const reasons = cptReasons[request.body.procedure];
-    const rating = reasons.getRating(new Set([request.body.indication]));
-    response.status(200).send(rating);
-  }
-  response.end();
-});
-
-app.post('/auth', function(request, response) {
-  const username = request.body.username;
-  const password = request.body.password;
-  if (username && password) {
-    request.session.loggedin = true;
-    request.session.username = username;
-    response.redirect('/');
-  } else {
-    response.send('Please enter Username and Password!');
-  }
-  response.end();
+  const reasons = cptReasons[request.body.procedure];
+  const rating = reasons.getRating(new Set([request.body.indication]));
+  response.status(200).send(rating).end();
 });
 
 app.listen(port);
