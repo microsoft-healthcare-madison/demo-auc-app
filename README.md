@@ -47,8 +47,10 @@ V3 TODO
 - [x] Make a CDS Hook Service to *always* launch a SMART card for draft orders
   - [x] Refactor the AUC logic into a module, enabling use in the hook too.
   - [x] Write a new CDS Hook server to be run with npm
-- [ ] Enable the form to read the draft order from the fhir client on load
-- [ ] Enable writes to the form to update the draft order in the EHR
+- [ ] Complete the App
+  - [ ] Enable the EHR to close the form with a `ui.done` message
+  - [x] Enable the form to read the draft order from the fhir client on load
+  - [ ] Enable writes to the form to update the draft order in the EHR
 
 V2 TODO
 -------

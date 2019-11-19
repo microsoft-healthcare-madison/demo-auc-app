@@ -42,32 +42,27 @@ function getReasons(serviceRequest) {
     .map(coding => coding.code).flat();
 }
 
-function getRating(serviceRequest) {
-  const orders = getOrders(serviceRequest);
+function getRating(orders, reasons) {
   if (orders.length) {
     const criterion = auc.criteria[orders[0]];
-    if (criterion) {
-      const reasons = getReasons(serviceRequest);
-      if (reasons.length) {
-        return criterion.getRating(new Set(reasons));
-      }
+    if (criterion && reasons.length) {
+      return criterion.getRating(new Set(reasons));
     }
   }
   return 'no-guidelines-apply';
 }
 
-function shouldShowCard(serviceRequest) {
-  return [...getOrders(serviceRequest), ...getReasons(serviceRequest)].length;
-}
-
 app.post('/cds-services/demo-auc-app', function(request, response) {
   const serviceRequest = request.body.context.draftOrders.entry[0].resource;
-  if (!shouldShowCard(serviceRequest)) {
+  const orders = getOrders(serviceRequest);
+  const indications = getReasons(serviceRequest);
+
+  if ([...orders, ...indications].length === 0) {
     response.json({cards: [], actions: []});
     return;
   }
 
-  const card = cardDetails[getRating(serviceRequest)];
+  const card = cardDetails[getRating(orders, indications)];
   const label = 'Click to view the source presentation.';
   const sourceUrl = 'https://docs.google.com/presentation/d/1QT6HWPW1Kix656s8hZzCMY7fgkTEEck0_aApBASc7rk/edit?usp=sharing';
   const cards = [{
@@ -76,6 +71,7 @@ app.post('/cds-services/demo-auc-app', function(request, response) {
     detail: card.detail,
     source: { label, url: sourceUrl, icon: card.icon },
     links: [{
+      appContext: JSON.stringify({indications, orders}),
       label: 'Edit Order in Demo App',
       url: launchUrl,
       type: 'smart'

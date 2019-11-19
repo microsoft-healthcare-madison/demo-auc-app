@@ -29,26 +29,26 @@
         <tr>
           <th><label for="indication">Indication</label></th>
           <td>
-            <input list="indications" name="indication" required>
-            <datalist id="indications">
-              <option value="13213009">congenital heart disease</option>
-              <option value="25064002">headache</option>
-              <option value="279039007">lower back pain</option>
-              <option value="423341008">optic disc edema</option>
-              <option value="27355003">toothache</option>
+            <input id="indications" list="indicationsData" name="indication" required>
+            <datalist id="indicationsData">
+              <option id="13213009" value="13213009">congenital heart disease</option>
+              <option id="25064002" value="25064002">headache</option>
+              <option id="279039007" value="279039007">lower back pain</option>
+              <option id="423341008" value="423341008">optic disc edema</option>
+              <option id="27355003" value="27355003">toothache</option>
             </datalist>
           </td>
         </tr>
         <tr>
           <th><label for="procedure">Procedure</label></th>
           <td>
-            <input list="procedures" name="procedure" required>
-            <datalist id="procedures">
-              <option value="75561">cardiac mri</option>
-              <option value="70450">ct scan - no contrast material</option>
-              <option value="71275">cta - with contrast material</option>
-              <option value="72133">lumbar spine ct scan</option>
-              <option value="70544">mra - head</option>
+            <input id="orders" list="proceduresData" name="procedure" required>
+            <datalist id="proceduresData">
+              <option id="75561" value="75561">cardiac mri</option>
+              <option id="70450" value="70450">ct scan - no contrast material</option>
+              <option id="71275" value="71275">cta - with contrast material</option>
+              <option id="72133" value="72133">lumbar spine ct scan</option>
+              <option id="70544" value="70544">mra - head</option>
             </datalist>
           </td>
         </tr>
@@ -59,8 +59,14 @@
 
   <script src="node_modules/fhirclient/build/fhir-client.js"></script>
   <script>
+
     async function getContext(client) {
+      const context = JSON.parse(client.state.tokenResponse.appContext || '{}');
+      const indications = context.indications || [-1];
+      const orders = context.orders || [-1];
       return {
+        indication: indications.pop(),
+        order: orders.pop(),
         patient: await client.patient.read(),
         user: await client.user.read(),
       };
@@ -75,17 +81,25 @@
 
       document.getElementById('provider').value = context.user.id;
       document.getElementById('age').value = Math.round(age);
-      document.getElementById(patient.gender).setAttribute('selected', 1);
+      document.getElementById(context.patient.gender).setAttribute('selected', 1);
+      if (context.indication !== -1) {
+        document.getElementById('indications').value = context.indication;
+      }
+      if (context.order !== -1) {
+        document.getElementById('orders').value = context.order;
+      }
     }
 
-    if (typeof FHIR !== 'undefined') {
-      FHIR.oauth2.ready()
-        .then(getContext)
-        .then(populateForm)
-        .catch(console.error);
+    if (typeof FHIR === 'undefined') {
+      throw new Error('Unable to load the FHIR client.  Halting page load.');
     }
+
+    FHIR.oauth2.ready()
+      .then(getContext)
+      .then(populateForm)
+      .catch(console.error);
+
   </script>
-
 
 </body>
 
