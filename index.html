@@ -8,7 +8,7 @@
 
 <body>
   <div>
-    <form action="http://localhost:3002/evaluate" method="POST">
+    <form id='auc_form' onsubmit="return evaluateFormContent()">
       <input type="hidden" id="provider" name="provider">
       <table>
         <caption>Enter Patient Demographics</caption>
@@ -53,15 +53,21 @@
           </td>
         </tr>
       </table>
-      <input type="submit">
+      <input type="submit" value="Evaluate" />
     </form>
   </div>
   <br>
+
+  <div>Current rating is:</div><div id='rating'>Calculating Rating...</div>
+  <br>
+
   <div id='button_panel' style='display:none'>
     <button id="close_btn" onclick='closeApp()' style='background-color: rgb(255, 95, 95);'>Close App</button>
     <button id="update_btn" onclick='updateApp()' style='background-color: rgb(127, 255, 95);'>Update ERH</button>
   </div>
 
+  <script>let module = {};</script>
+  <script src="auc.js"></script>
   <script src="node_modules/fhirclient/build/fhir-client.js"></script>
   <script src="http://wzrd.in/standalone/uuid%2Fv4@latest"></script>
   <script>
@@ -100,8 +106,29 @@
       }
     }
 
+    function evaluateFormContent() {
+      document.getElementById('rating').innerText = getRating();
+      return false;  // prevent page refresh
+    }
+
+    function getRating() {
+      const order = document.getElementById('orders').value;
+      const reasons = document.getElementById('indications').value;
+      if (order) {
+        const criterion = criteria[order];
+        if (criterion && reasons) {
+          return criterion.getRating(new Set([reasons]));
+        }
+      }
+      return 'no-guidelines-apply';
+    }
+
+    function showRating() {
+      document.getElementById('rating').innerText = getRating();
+    }
+
     function showButtons() {
-      // TODO: only show these if there's a UI available *to* update.
+      // BONUS: only show these if there's a UI available *to* update.
       document.getElementById('button_panel').style.display = 'block';
     }
 
@@ -116,6 +143,7 @@
     FHIR.oauth2.ready()
       .then(getContext)
       .then(populateForm)
+      .then(showRating)
       .then(showButtons)
       .catch(console.error);
 
@@ -128,7 +156,7 @@
     }
 
     function addRating(draftOrder, rating) {
-      // TODO: make this reuseable elsewhere, or import from a module.
+      // BONUS: make this reuseable elsewhere, or import from a module.
       draftOrder.resource.extension = [
         {
           "url": "http://fhir.org/argonaut/Extension/pama-rating",
@@ -165,7 +193,7 @@
 
     function updateApp() {
       const draftOrder = appContext.draftOrder;
-      const rating = 'appropriate';  // TODO: get this from the post?  Load module?
+      const rating = getRating();
 
       applyFormData(draftOrder);
       addRating(draftOrder, rating);
@@ -177,7 +205,7 @@
         messageType: 'scratchpad.update'
       }, targetOrigin);
 
-//      closeApp();  // Keep, enable once v3.0 is done.
+      closeApp();  // Keep, enable once v3.0 is done.
     }
 
   </script>
