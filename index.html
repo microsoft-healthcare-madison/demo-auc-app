@@ -8,7 +8,7 @@
 
 <body>
   <div>
-    <form action="http://localhost:3002/evaluate" method="POST">
+    <form id='auc_form' onsubmit="return evaluateFormContent()">
       <input type="hidden" id="provider" name="provider">
       <table>
         <caption>Enter Patient Demographics</caption>
@@ -29,38 +29,59 @@
         <tr>
           <th><label for="indication">Indication</label></th>
           <td>
-            <input list="indications" name="indication" required>
-            <datalist id="indications">
-              <option value="13213009">congenital heart disease</option>
-              <option value="25064002">headache</option>
-              <option value="279039007">lower back pain</option>
-              <option value="423341008">optic disc edema</option>
-              <option value="27355003">toothache</option>
+            <input id="indications" list="indicationsData" name="indication" required>
+            <datalist id="indicationsData">
+              <option id="13213009" value="13213009">congenital heart disease</option>
+              <option id="25064002" value="25064002">headache</option>
+              <option id="279039007" value="279039007">lower back pain</option>
+              <option id="423341008" value="423341008">optic disc edema</option>
+              <option id="27355003" value="27355003">toothache</option>
             </datalist>
           </td>
         </tr>
         <tr>
           <th><label for="procedure">Procedure</label></th>
           <td>
-            <input list="procedures" name="procedure" required>
-            <datalist id="procedures">
-              <option value="75561">cardiac mri</option>
-              <option value="70450">ct scan - no contrast material</option>
-              <option value="71275">cta - with contrast material</option>
-              <option value="72133">lumbar spine ct scan</option>
-              <option value="70544">mra - head</option>
+            <input id="orders" list="proceduresData" name="procedure" required>
+            <datalist id="proceduresData">
+              <option id="75561" value="75561">cardiac mri</option>
+              <option id="70450" value="70450">ct scan - no contrast material</option>
+              <option id="71275" value="71275">cta - with contrast material</option>
+              <option id="72133" value="72133">lumbar spine ct scan</option>
+              <option id="70544" value="70544">mra - head</option>
             </datalist>
           </td>
         </tr>
       </table>
-      <input type="submit">
+      <input type="submit" value="Evaluate" />
     </form>
   </div>
+  <br>
 
+  <div>Current rating is:</div><div id='rating'>Waiting for data...</div>
+  <br>
+  <div id='button_panel' style='display:none'>
+    <button id="close_btn" onclick='closeApp()' style='background-color: rgb(255, 95, 95);'>Close App</button>
+    <button id="update_btn" onclick='updateApp()' style='background-color: rgb(127, 255, 95);'>Update ERH</button>
+  </div>
+
+  <script>let module = {};</script>
+  <script src="auc.js"></script>
   <script src="node_modules/fhirclient/build/fhir-client.js"></script>
+  <script src="http://wzrd.in/standalone/uuid%2Fv4@latest"></script>
   <script>
+
+    const QCDSMID = 'G-1011';
+    let appContext = null;
+
     async function getContext(client) {
+      const appContextStr = client.state.tokenResponse.appContext || '{}';
+      appContext = JSON.parse(appContextStr);
+      const indications = appContext.indications || [-1];
+      const orders = appContext.orders || [-1];
       return {
+        indication: indications.pop() || -1,
+        order: orders.pop() || -1,
         patient: await client.patient.read(),
         user: await client.user.read(),
       };
@@ -75,18 +96,112 @@
 
       document.getElementById('provider').value = context.user.id;
       document.getElementById('age').value = Math.round(age);
-      document.getElementById(patient.gender).setAttribute('selected', 1);
+      document.getElementById(context.patient.gender).setAttribute('selected', 1);
+      if (context.indication !== -1) {
+        document.getElementById('indications').value = context.indication;
+      }
+      if (context.order !== -1) {
+        document.getElementById('orders').value = context.order;
+      }
     }
 
-    if (typeof FHIR !== 'undefined') {
-      FHIR.oauth2.ready()
-        .then(getContext)
-        .then(populateForm)
-        .catch(console.error);
+    function evaluateFormContent() {
+      document.getElementById('rating').innerText = getRating();
+      return false;  // prevent page refresh
     }
+
+    function getRating() {
+      const order = document.getElementById('orders').value;
+      const reasons = document.getElementById('indications').value;
+      return evaluate(order, [reasons]);
+    }
+
+    function showRating() {
+      document.getElementById('rating').innerText = getRating();
+    }
+
+    function showButtons() {
+      // BONUS: only show these if there's a UI available *to* update.
+      document.getElementById('button_panel').style.display = 'block';
+    }
+
+    if (typeof FHIR === 'undefined') {
+      throw new Error('Unable to load the FHIR client.  Halting page load.');
+    }
+
+    const messagingHandle = 'demo_auc_guideline_consultation_app';
+    const targetWindow = window.parent !== window.self ? window.parent : window.opener;
+    const targetOrigin = 'http://sandbox.cds-hooks.org';
+
+    FHIR.oauth2.ready()
+      .then(getContext)
+      .then(populateForm)
+      .then(showRating)
+      .then(showButtons)
+      .catch(console.error);
+
+    function closeApp() {
+      targetWindow.postMessage({
+        messagingHandle,
+        messageId: uuidv4(),
+        messageType: 'ui.done'
+      }, targetOrigin)
+    }
+
+    function addRating(draftOrder, rating) {
+      // BONUS: make this reuseable elsewhere, or import from a module.
+      draftOrder.resource.extension = [
+        {
+          "url": "http://fhir.org/argonaut/Extension/pama-rating",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://fhir.org/argonaut/CodeSystem/pama-rating",
+                "code": rating
+              }
+            ]
+          }
+        },
+        {
+          "url": "http://fhir.org/argonaut/Extension/pama-rating-qcdsm-consulted",
+          "valueString": QCDSMID
+        },
+        {
+          "url": "http://fhir.org/argonaut/Extension/pama-rating-consult-id",
+          "valueUri": `urn:${ uuidv4() }`
+        }
+      ];
+    }
+
+    function applyFormData(draftOrder) {
+      const orderId = document.getElementById('orders');
+      const orderText = document.getElementById(orderId.value).innerText;
+      const indicationId = document.getElementById('indications');
+      const indicationText = document.getElementById(indicationId.value).innerText;
+      draftOrder.resource.code.coding[0].code = orderId.value;
+      draftOrder.resource.code.coding[0].display = orderText;
+      draftOrder.resource.reasonCode[0].coding[0].code = indicationId.value;
+      draftOrder.resource.reasonCode[0].coding[0].display = indicationText;
+    }
+
+    function updateApp() {
+      const draftOrder = appContext.draftOrder;
+      const rating = getRating();
+
+      applyFormData(draftOrder);
+      addRating(draftOrder, rating);
+
+      targetWindow.postMessage({
+        payload: draftOrder,
+        messagingHandle,
+        messageId: uuidv4(),
+        messageType: 'scratchpad.update'
+      }, targetOrigin);
+
+      closeApp();  // Keep, enable once v3.0 is done.
+    }
+
   </script>
-
-
 </body>
 
 </html>
