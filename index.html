@@ -65,8 +65,8 @@
       const indications = context.indications || [-1];
       const orders = context.orders || [-1];
       return {
-        indication: indications.pop(),
-        order: orders.pop(),
+        indication: indications.pop() || -1,
+        order: orders.pop() || -1,
         patient: await client.patient.read(),
         user: await client.user.read(),
       };
