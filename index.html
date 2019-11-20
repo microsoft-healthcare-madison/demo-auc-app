@@ -60,17 +60,20 @@
   <div id='button_panel' style='display:none'>
     <button id="close_btn" onclick='closeApp()' style='background-color: rgb(255, 95, 95);'>Close App</button>
     <button id="update_btn" onclick='updateApp()' style='background-color: rgb(127, 255, 95);'>Update ERH</button>
-    <button id="read_btn" onclick='readApp()' style='background-color: rgb(95, 236, 255);'>READ SCRATCHPAD</button>
   </div>
 
   <script src="node_modules/fhirclient/build/fhir-client.js"></script>
   <script src="http://wzrd.in/standalone/uuid%2Fv4@latest"></script>
   <script>
 
+    const QCDSMID = 'G-1011';
+    let appContext = null;
+
     async function getContext(client) {
-      const context = JSON.parse(client.state.tokenResponse.appContext || '{}');
-      const indications = context.indications || [-1];
-      const orders = context.orders || [-1];
+      const appContextStr = client.state.tokenResponse.appContext || '{}';
+      appContext = JSON.parse(appContextStr);
+      const indications = appContext.indications || [-1];
+      const orders = appContext.orders || [-1];
       return {
         indication: indications.pop() || -1,
         order: orders.pop() || -1,
@@ -98,6 +101,7 @@
     }
 
     function showButtons() {
+      // TODO: only show these if there's a UI available *to* update.
       document.getElementById('button_panel').style.display = 'block';
     }
 
@@ -115,14 +119,65 @@
       .then(showButtons)
       .catch(console.error);
 
-    const SMART = FHIR.oauth2;
-
     function closeApp() {
       targetWindow.postMessage({
         messagingHandle,
         messageId: uuidv4(),
         messageType: 'ui.done'
       }, targetOrigin)
+    }
+
+    function addRating(draftOrder, rating) {
+      // TODO: make this reuseable elsewhere, or import from a module.
+      draftOrder.resource.extension = [
+        {
+          "url": "http://fhir.org/argonaut/Extension/pama-rating",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://fhir.org/argonaut/CodeSystem/pama-rating",
+                "code": rating
+              }
+            ]
+          }
+        },
+        {
+          "url": "http://fhir.org/argonaut/Extension/pama-rating-qcdsm-consulted",
+          "valueString": QCDSMID
+        },
+        {
+          "url": "http://fhir.org/argonaut/Extension/pama-rating-consult-id",
+          "valueUri": `urn:${ uuidv4() }`
+        }
+      ];
+    }
+
+    function applyFormData(draftOrder) {
+      const orderId = document.getElementById('orders');
+      const orderText = document.getElementById(orderId.value).innerText;
+      const indicationId = document.getElementById('indications');
+      const indicationText = document.getElementById(indicationId.value).innerText;
+      draftOrder.resource.code.coding[0].code = orderId.value;
+      draftOrder.resource.code.coding[0].display = orderText;
+      draftOrder.resource.reasonCode[0].coding[0].code = indicationId.value;
+      draftOrder.resource.reasonCode[0].coding[0].display = indicationText;
+    }
+
+    function updateApp() {
+      const draftOrder = appContext.draftOrder;
+      const rating = 'appropriate';  // TODO: get this from the post?  Load module?
+
+      applyFormData(draftOrder);
+      addRating(draftOrder, rating);
+
+      targetWindow.postMessage({
+        payload: draftOrder,
+        messagingHandle,
+        messageId: uuidv4(),
+        messageType: 'scratchpad.update'
+      }, targetOrigin);
+
+//      closeApp();  // Keep, enable once v3.0 is done.
     }
 
   </script>
