@@ -58,6 +58,7 @@
   </div>
 
   <script src="node_modules/fhirclient/build/fhir-client.js"></script>
+  <script src="http://wzrd.in/standalone/uuid%2Fv4@latest"></script>
   <script>
 
     async function getContext(client) {
@@ -94,13 +95,28 @@
       throw new Error('Unable to load the FHIR client.  Halting page load.');
     }
 
+    const messagingHandle = 'demo_auc_guideline_consultation_app';
+    const targetWindow = window.parent !== window.self ? window.parent : window.opener;
+    const targetOrigin = 'http://sandbox.cds-hooks.org';
+
     FHIR.oauth2.ready()
       .then(getContext)
       .then(populateForm)
       .catch(console.error);
 
+    const SMART = FHIR.oauth2;
+
+    function closeApp() {
+      targetWindow.postMessage({
+        messagingHandle,
+        messageId: uuidv4(),
+        messageType: 'ui.done'
+      }, targetOrigin)
+    }
+
   </script>
 
+<button onclick='closeApp()' style="background-color:rgb(190, 0, 0)">Close App</button>
 </body>
 
 </html>
