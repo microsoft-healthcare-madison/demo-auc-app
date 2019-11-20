@@ -17,8 +17,13 @@ app.get('/consult', function(request, response) {
 
 app.post('/evaluate', function(request, response) {
   const criterion = auc.criteria[request.body.procedure];
-  const rating = criterion.getRating(new Set([request.body.indication]));
-  response.status(200).send(rating).end();
+  if (criterion) {
+    const rating = criterion.getRating(new Set([request.body.indication]));
+    response.status(200).send(rating);
+  } else {
+    response.status(200).send('no-guidelines-apply');
+  }
+  response.end();
 });
 
 app.listen(port);
