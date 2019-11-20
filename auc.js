@@ -45,6 +45,16 @@ class Criterion {
   }
 };
 
+function evaluate(order, reasons) {
+  if (order) {
+    const criterion = criteria[order];
+    if (criterion && reasons.length) {
+      return criterion.getRating(new Set(reasons));
+    }
+  }
+  return 'no-guidelines-apply';
+}
+
 const criteria = {
   'no-procedures-for': new Criterion([[SNOMED.TOOTHACHE]], []),
   [CPT.CT_HEAD_NO_CONTRAST]: new Criterion([[SNOMED.HEADACHE, SNOMED.OPTIC_DISC_EDEMA]], []),
@@ -55,5 +65,5 @@ const criteria = {
 };
 
 module.exports = {
-  CPT, SNOMED, criteria, getRating: Criterion.prototype.getRating,
+  CPT, SNOMED, criteria, evaluate, getRating: Criterion.prototype.getRating,
 };

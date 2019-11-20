@@ -113,13 +113,7 @@
     function getRating() {
       const order = document.getElementById('orders').value;
       const reasons = document.getElementById('indications').value;
-      if (order) {
-        const criterion = criteria[order];
-        if (criterion && reasons) {
-          return criterion.getRating(new Set([reasons]));
-        }
-      }
-      return 'no-guidelines-apply';
+      return evaluate(order, [reasons]);
     }
 
     function showRating() {

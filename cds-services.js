@@ -42,16 +42,6 @@ function getReasons(serviceRequest) {
     .map(coding => coding.code).flat();
 }
 
-function getRating(orders, reasons) {
-  if (orders.length) {
-    const criterion = auc.criteria[orders[0]];
-    if (criterion && reasons.length) {
-      return criterion.getRating(new Set(reasons));
-    }
-  }
-  return 'no-guidelines-apply';
-}
-
 app.post('/cds-services/demo-auc-app', function(request, response) {
   const draftOrder = request.body.context.draftOrders.entry[0];
   const serviceRequest = draftOrder.resource;
@@ -63,7 +53,8 @@ app.post('/cds-services/demo-auc-app', function(request, response) {
     return;
   }
 
-  const card = cardDetails[getRating(orders, indications)];
+  const rating = auc.evaluate(orders.slice().pop(), reasons);
+  const card = cardDetails[rating];
   const label = 'Click to view the source presentation.';
   const sourceUrl = 'https://docs.google.com/presentation/d/1QT6HWPW1Kix656s8hZzCMY7fgkTEEck0_aApBASc7rk/edit?usp=sharing';
   const cards = [{
