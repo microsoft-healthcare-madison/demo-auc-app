@@ -50,7 +50,7 @@ V3 TODO
 - [ ] Complete the App
   - [x] Enable the EHR to close the form with a `ui.done` message
   - [x] Enable the form to read the draft order from the fhir client on load
-  - [ ] Enable writes to the form to update the draft order in the EHR
+  - [x] Enable writes to the form to update the draft order in the EHR
 
 V2 TODO
 -------
