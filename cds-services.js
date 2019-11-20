@@ -53,7 +53,8 @@ function getRating(orders, reasons) {
 }
 
 app.post('/cds-services/demo-auc-app', function(request, response) {
-  const serviceRequest = request.body.context.draftOrders.entry[0].resource;
+  const draftOrder = request.body.context.draftOrders.entry[0];
+  const serviceRequest = draftOrder.resource;
   const orders = getOrders(serviceRequest);
   const indications = getReasons(serviceRequest);
 
@@ -71,7 +72,7 @@ app.post('/cds-services/demo-auc-app', function(request, response) {
     detail: card.detail,
     source: { label, url: sourceUrl, icon: card.icon },
     links: [{
-      appContext: JSON.stringify({indications, orders}),
+      appContext: JSON.stringify({indications, orders, draftOrder}),
       label: 'Edit Order in Demo App',
       url: launchUrl,
       type: 'smart'
