@@ -44,8 +44,6 @@ When you use the magic H3 heading `### What You'll Learn` - the following unorde
 - there
 ```
 
-
-
 ### Tables
 
 Your codelab can use very simple markdown (or HTML) tables.
