@@ -107,7 +107,7 @@ Duration: 5
 
 You are provided with a very simple, but working, guideline consultation app.  In PAMA parlance, this would be software from a Qualified CDS Mechanism, or a QCDSM.
 
-**TODO**: embed an iframe of the working app, hosted on glitch.com
+![https://glitch.com/embed/#!/embed/jewel-chevre?path=package.json&previewSize=100](v1)
 
 ### SMART Launch
 
@@ -153,6 +153,7 @@ Positive
 - <https://www.sitepoint.com/quick-tip-multiple-versions-node-nvm/>
 
 ### Frequently Asked Questions
+- <https://stackoverflow.com/questions/16904658/node-version-manager-install-nvm-command-not-found>
 - <https://stackoverflow.com/questions/9755841/how-can-i-change-the-version-of-npm-using-nvm>
 - <https://stackoverflow.com/questions/34810526/how-to-properly-upgrade-node-using-nvm>
 
@@ -170,7 +171,9 @@ The companion source code for this codelab is currently at:
 To begin this codelab, begin by cloning the repository *at* the initial version, which is `v1.0`.
 
 ```sh
-git clone --depth=1 --branch v1.0 git@github.com:microsoft-healthcare-madison/demo-auc-app.git
+mkdir ~/codelab
+cd ~/codelab
+git clone --branch v1.0 git@github.com:microsoft-healthcare-madison/demo-auc-app.git
 cd demo-auc-app
 npm install
 ```
@@ -201,6 +204,11 @@ Be sure to *also* try any of the above tests, but with a missing field.  The app
 
 ### Frequently Asked Questions
 
+#### I see this when trying to run the demo: `npm ERR! code ENOENT`
+
+Negative
+: Be sure you run `npm install` inside the `demo-auc-app` directory that you cloned from git.  After that completes, *then* run `npm run demo` and visit <http://localhost:3001>.
+
 #### This site can't be reached.
 
 Negative
@@ -214,19 +222,25 @@ Negative
 ## Enable SMART launch
 Duration: 60
 
-With the SMART launch API, the app will be able to securely read data from the EHR using the credentials of the clinician.  The provider will not need to remember a separate username and password to use the app anymore, and the app will be able to pre-load form fields using the available context in the EHR.
+With the [SMART App Launch Framework](https://www.hl7.org/fhir/smart-app-launch/), the app will be able to securely read data from the EHR using the credentials of the clinician (through OAuth2 openid connect).  The provider will not need to remember a separate username and password to use the app anymore, and the app will be able to pre-load form fields using the available context in the EHR.
 
 This will reduce user errors, save the user time, and spare them some frustrations.
 
 ### SMART Launch Documentation
 
-TODO: make sure the launch `state` value is being used appropriately in demo code. :B
-<http://www.hl7.org/fhir/smart-app-launch/#app-protection>
-
 There is a very handy javascript library to enable easy configuration of SMART launches from the app.
 <http://docs.smarthealthit.org/client-js/>
 
-EXERCISE: Consult the link above, and create a `launch.html` endpoint.
+#### EXERCISE 1
+Positive
+: Consult the link above, and create a `launch.html` endpoint.
+
+Confused?  Part of the goal of this codelab is to get you familiar with using the documentation, so there will be minimal hand-holding throughout.
+
+Here are a couple of hints, in case this seems like a vague request.  
+
+- You may need to use the `npm` command to install the library.
+- Once installed, you will want to create an endpoint 'page' for use in a browser using the 'As Library' approach, rather than the 'As Module' approach.
 
 TODO: reveal a solution `launch.html` endpoint and confirm that student solution is correct.
 - Are the scopes correct?
@@ -438,11 +452,11 @@ You can embed an iframe in a codelab by setting the `alt` attribute of an `img` 
 
 #### Example: embedded `https://glitch.com/~howoldisit`
 
-![https://glitch.com/~howoldisit](Glitch iframe)
+![https://glitch.com/embed/#!/embed/jewel-chevre?path=package.json&previewSize=100](Glitch iframe)
 
 #### `codelab markdown`
 ```html
-![https://glitch.com/~howoldisit](Glitch iframe)
+![https://glitch.com/embed/#!/embed/jewel-chevre?path=package.json&previewSize=100](Glitch iframe)
 ```
 
 ### Frequently Asked Questions
