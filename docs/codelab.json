@@ -1,0 +1,26 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2019-12-06T13:49:00-06:00",
+  "id": "demo-auc-app",
+  "duration": 265,
+  "title": "Embed an External AUC Guideline Consultation App Into an EHR",
+  "authors": "Carl Anderson",
+  "summary": "Demo EHR Integrated AUC Guideline Consultation App",
+  "source": "../../../madison-healthcare-madison/demo-auc-app/codelab.md",
+  "theme": "",
+  "status": [
+    "draft"
+  ],
+  "category": [
+    "cds-hoooks smart smart-web-messaging"
+  ],
+  "tags": [
+    "cds-hoooks smart smart-web-messaging smart-launch pama auc qcdsm ple",
+    "web"
+  ],
+  "feedback": "https://github.com/microsoft-healthcare-madison/demo-auc-app/issues",
+  "url": "demo-auc-app"
+}
