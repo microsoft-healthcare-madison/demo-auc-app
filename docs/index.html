@@ -27,6 +27,273 @@
                   environment="web"
                   feedback-link="https://github.com/microsoft-healthcare-madison/demo-auc-app/issues">
     
+      <google-codelab-step label="Introduction" duration="10">
+        <h2 is-upgraded>Welcome, student!</h2>
+<p>This codelab is intended to teach you about the <a href="http://www.hl7.org/fhir/smart-app-launch/" target="_blank">SMART launch framework</a>, <a href="https://cds-hooks.org/" target="_blank">CDS Hooks</a>, and <a href="https://github.com/smart-on-fhir/smart-web-messaging" target="_blank">SMART Web Messaging</a> by walking you through a coding exercise that uses those technologies.</p>
+<h3 is-upgraded>Profile Audience</h3>
+<p>This guide is intended for programmers who wish to <em>learn by doing</em>.  You should already have a working knowledge of web programing, access to a development machine, and about 2 to 4 total hours to dedicate to completing the whole codelab.</p>
+<h3 is-upgraded>Prerequisites</h3>
+<p>This guide assumes you are already familiar with javascript and are comfortable with web programming concepts.  It also helps to know the basics of <code>git</code>, but there will be example commands throughout for convenience.  The provided initial codebase uses <code>javascript</code>, <code>node</code>, <code>npn</code>, and <code>express</code> - so some prior experience with those tools will be helpful, but not required.</p>
+<p>As always, you are free to re-write entire portions of the code in whatever framework you like (but please feel free to share your work with us)!</p>
+<h3 is-upgraded>Major Milestones</h3>
+<p>You will start with an already-implemented form-entry app that evaluates the appropriateness of a potential advanced imaging order and displays a rating of either <code>appropriate</code>, <code>not-appropriate</code>, or <code>no-guidelines-apply</code>.</p>
+<ul>
+<li>v1: Make the app SMART-launch capable, enabling an EHR to launch it.</li>
+<li>v2: Create a CDS hook service to evaluate a <em>draft</em> order in an EHR, and show a link to the SMART app.</li>
+<li>v3: Enable the SMART app to update the draft order inside the EHR.</li>
+</ul>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="PAMA" duration="20">
+        <h2 is-upgraded>PAMA - Protecting Access to Medicare Act of 2014</h2>
+<aside class="warning"><p><em>&#34;If we in the United States could lower the prices and per-capita volumes of our CT scans, MRIs, and just the top 25 high-volume-high-price surgical procedures to those of the Netherlands, for example, we would see savings of about $425 per capita, or a total of $137 billion.&#34;</em></p>
+<p><a href="https://en.wikipedia.org/wiki/Ezekiel_Emanuel" target="_blank"><strong>Ezekiel Emanuel</strong></a><strong>, on an </strong><a href="https://jamanetwork.com/journals/jama/article-abstract/2674671" target="_blank"><strong>article published in JAMA, March 2018</strong></a></p>
+</aside>
+<h3 is-upgraded>Skip Ahead</h3>
+<p>This section has <em>lots</em> of background which explains <em>why</em> the <a href="https://www.cms.gov/Medicare/Medicare-Fee-for-Service-Payment/ClinicalLabFeeSched/PAMA-Regulations" target="_blank">PAMA</a> imaging use case was chosen for this exercise.  If you aren&#39;t interested in PAMA, and are here purely to learn the technology, you can skip ahead to the next section.  However, it might help to take at least <em>a few</em> minutes to skim this material, just to get the gist of what problem is being solved.</p>
+<h3 is-upgraded><strong>Warp</strong> Ahead</h3>
+<p>If you already have a good grasp of the SMART launch process, and you would like to do a lot more than <em>skip</em> ahead, you can <strong>warp</strong> ahead and begin the process at CDS hook implementation by checking out the code at <code>v2.0</code> in the repo and advancing to the section called <strong>Write a CDS hook</strong> in this codelab.</p>
+<p>There&#39;s another git tag, <code>v3.0</code>, for the <strong>final</strong> solution.  Check out this version of the code if you just want to play with a working copy of the app.  However, if you&#39;re here to learn, it is recommended that you find time to do the full codelab.</p>
+<h2 is-upgraded>PAMA Imaging</h2>
+<p>New PAMA imaging requirements are taking effect, starting on January 1st, 2020.  The American College of Radiology has put out some very helpful media to explain why this is important.</p>
+<ul>
+<li><a href="https://www.acr.org/-/media/ACR/Files/Clinical-Resources/Clinical-Decision-Support/RSCAN-PAMA_flyer.pdf" target="_blank">https://www.acr.org/-/media/ACR/Files/Clinical-Resources/Clinical-Decision-Support/RSCAN-PAMA_flyer.pdf</a></li>
+<li><a href="https://www.acr.org/Clinical-Resources/Clinical-Decision-Support" target="_blank">https://www.acr.org/Clinical-Resources/Clinical-Decision-Support</a></li>
+</ul>
+<h3 is-upgraded>Timeline</h3>
+<table>
+<tr></tr>
+<tr><td colspan="1" rowspan="1"><p>2020</p>
+</td><td colspan="1" rowspan="1"><p>Starting in 2020, providers in the US who order diagnostic advanced imaging (CT, MRI, nuclear medicine, and PET scans) will need to provide <em>evidence</em> that they have consulted <em>best practice guidelines</em> for appropriate use of that technology <em>while they are still at the point of order entry</em>.</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>2021</p>
+</td><td colspan="1" rowspan="1"><p>Failure to submit a claim for imaging that has this evidence, starting in 2021, may <em>prevent</em> reimbursement (for Medicare part B claims) for furnishing providers (who are typically radiologists).</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>2022</p>
+</td><td colspan="1" rowspan="1"><p>Ordering providers who have a <em>consistently</em> poor history of ordering &#34;low value&#34; diagnosic imaging may then be subject to mandatory prior authorization before placing image orders for Medicare patients starting in 2022.  Some of those rules are TBD, depending on how the first two years go, though.</p>
+</td></tr>
+</table>
+<h3 is-upgraded>Apropriate Use Criteria (AUC)</h3>
+<p>In short, for software to determine whether an imaging technique is <em>apropriate</em> or not for a given diagnosis, several groups of specialists have been developing <em>apropriate use criteria</em> and publishing that criteria for the industry to adopt into the EHR workflow.  These AUC are regularly improved, updated, and re-published.</p>
+<h3 is-upgraded>Provider Led Entities (PLE)</h3>
+<p>The groups of experts and specialists who decide what is and isn&#39;t appropriate are called <em>Provider Led Entities</em>.  They develop the AUC out in the open and publish it reqularly for consumption by software vendors who provide CDS.</p>
+<h3 is-upgraded>Qualified CDS Mechanisms (QCDSM)</h3>
+<p>The software providers who use this criteria, the QCDSM vendors, must provide access to best practice guidelines for a wide spectrum of medical care areas.  For PAMA imaging, we are interested in the radiology imaging AUC and we have prepared a simple example of QCDSM guideline consultation software.  However, a QCDSM must use more than one published set of AUC in their software, and have a method of updating their AUC periodically.  As such, the software can be quite complex, and is often implemented as a stand-alone web service.</p>
+<h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
+<h3 is-upgraded>Why are <em>CDS Hooks</em> important for PAMA?</h3>
+<aside class="special"><p>To satisfy a radiologist&#39;s claim to CMS, the original order must include evidence that guidelines were consulted at the point of order entry (by the <em>ordering provider</em>).  This means that, while the ordering provider is still using the EHR, they must also be consulting a guideline app.  By using <em>CDS Hooks</em>, the EHR can provide a link to the guideline app as soon as it&#39;s relevant (like when selecting an order for advanced imaging, before signing the order).<br></p>
+</aside>
+<h3 is-upgraded>Why is <em>SMART Web Messaging</em> important for PAMA?</h3>
+<aside class="special"><p>Because the logic to determine <em>when</em> a service is or isn&#39;t appropriate can be very complex, this logic is often implemented in stand-alone web-based applications.  To enable those applications to <strong>update</strong> the currently <em>draft</em> order, we need SMART Web Messaging.  With SMART Web Messaging, we can easily and securely send data and actions <em>back</em> into the EHR.</p>
+</aside>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Exercise Outline" duration="5">
+        <p>You are provided with a very simple, but working, guideline consultation app.  In PAMA parlance, this would be software from a Qualified CDS Mechanism, or a QCDSM.</p>
+<iframe class="embedded-iframe" src="https://glitch.com/embed/#!/embed/jewel-chevre?path=package.json&previewSize=100"></iframe>
+<h2 is-upgraded>SMART Launch</h2>
+<p>You will add SMART launch capabilities to the app, allowing it to be launched by the EHR and to receive EHR data directly through the SMART launch client.</p>
+<p><strong>TODO</strong>: if possible, host the working v2 code on glitch and embed a link to it here.</p>
+<h2 is-upgraded>CDS Hooks</h2>
+<p>Once the app is capable of a SMART launch, you will write a CDS Hook service to alert ordering providers when they have made an order selection that is outside of guidelines.  The alert will give them a helpful link to click on, which will launch the app <em>within the EHR</em>.  The app will read context from the EHR and use that to pre-populate the appropriate fields in its form, saving the clinician time and mental effort.</p>
+<p><strong>TODO</strong>: insert some images of the cards</p>
+<h2 is-upgraded>SMART Web Messaging</h2>
+<p>Finally, a new button will be added in the app that will be able to update the draft order items with the current selection.  Upon update, evidence of guideline consultation will be attached to the order, before closing the app, returning the user to the order entry screen in the EHR.</p>
+<p><strong>TODO</strong>: insert an image of the embedded app.</p>
+<h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
+<h3 is-upgraded>Which EHRs currently support the technologies required to enable these services?</h3>
+<aside class="special"><p>Currently, Epic and T-System have implemented the required CDS hooks to enable this.  Cerner has committed to doing this, though, and it&#39;s not a matter of if, but of when.</p>
+</aside>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Prerequisites" duration="5">
+        <p>You must have a development machine with the following:</p>
+<table>
+<tr></tr>
+<tr><td colspan="1" rowspan="1"><p><code>git</code></p>
+</td><td colspan="1" rowspan="1"><p><a href="https://git-scm.com/downloads" target="_blank">Download</a></p>
+</td><td colspan="1" rowspan="1"><p>Needed to check out the initial codebase.</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><code>nvm</code></p>
+</td><td colspan="1" rowspan="1"><p><a href="https://github.com/nvm-sh/nvm" target="_blank">Download</a></p>
+</td><td colspan="1" rowspan="1"><p>RECOMMENDED to manage different installed versions of <code>node</code>.</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><code>nvm-windows</code></p>
+</td><td colspan="1" rowspan="1"><p><a href="https://github.com/coreybutler/nvm-windows/releases" target="_blank">Download</a></p>
+</td><td colspan="1" rowspan="1"><p>WINDOWS version of <code>nvm</code>.</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p><code>npm</code></p>
+</td><td colspan="1" rowspan="1"><p><a href="https://nodejs.org/en/download/" target="_blank">Download</a></p>
+</td><td colspan="1" rowspan="1"><p>Needed to install the server dependencies and run it locally.</p>
+</td></tr>
+</table>
+<aside class="special"><p>This guide was developed using <code>node v11.0.0</code>, but any version higher than that should also work.</p>
+</aside>
+<h2 is-upgraded>Links</h2>
+<ul>
+<li><a href="https://www.sitepoint.com/quick-tip-multiple-versions-node-nvm/" target="_blank">https://www.sitepoint.com/quick-tip-multiple-versions-node-nvm/</a></li>
+</ul>
+<h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
+<ul class="faq">
+<li><a href="https://stackoverflow.com/questions/16904658/node-version-manager-install-nvm-command-not-found" target="_blank">https://stackoverflow.com/questions/16904658/node-version-manager-install-nvm-command-not-found</a></li>
+<li><a href="https://stackoverflow.com/questions/9755841/how-can-i-change-the-version-of-npm-using-nvm" target="_blank">https://stackoverflow.com/questions/9755841/how-can-i-change-the-version-of-npm-using-nvm</a></li>
+<li><a href="https://stackoverflow.com/questions/34810526/how-to-properly-upgrade-node-using-nvm" target="_blank">https://stackoverflow.com/questions/34810526/how-to-properly-upgrade-node-using-nvm</a></li>
+</ul>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Getting Started" duration="15">
+        <h2 is-upgraded>Code Repository</h2>
+<p>The companion source code for this codelab is currently at:<br><a href="https://github.com/microsoft-healthcare-madison/demo-auc-app" target="_blank">https://github.com/microsoft-healthcare-madison/demo-auc-app</a></p>
+<h2 is-upgraded>Clone v1.0</h2>
+<p>To begin this codelab, begin by cloning the repository <em>at</em> the initial version, which is <code>v1.0</code>.</p>
+<pre><code>mkdir ~/codelab
+cd ~/codelab
+git clone --branch v1.0 git@github.com:microsoft-healthcare-madison/demo-auc-app.git
+cd demo-auc-app
+npm install
+</code></pre>
+<p>The demo app is now ready to be started using this command:</p>
+<pre><code>npm run demo
+</code></pre>
+<p>To view the app, visit this URL: <a href="http://localhost:3001" target="_blank">http://localhost:3001</a></p>
+<h3 is-upgraded>Login</h3>
+<p>You can use any non-empty username and password to log in to the app.</p>
+<p class="image-container"><img alt="login" src="img/5676161ebc2cd176.png"></p>
+<h2 is-upgraded>Exercises</h2>
+<p>To get you familiar with the app and how it works, please launch the app and use it to rate the following combinations of demographics.</p>
+<table>
+<tr></tr>
+<tr><td colspan="1" rowspan="1"><p>4</p>
+</td><td colspan="1" rowspan="1"><p>male</p>
+</td><td colspan="1" rowspan="1"><p>lower back pain</p>
+</td><td colspan="1" rowspan="1"><p>lumbar spine CT</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>98</p>
+</td><td colspan="1" rowspan="1"><p>female</p>
+</td><td colspan="1" rowspan="1"><p>congenital heart disease</p>
+</td><td colspan="1" rowspan="1"><p>cardiac mri</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>29</p>
+</td><td colspan="1" rowspan="1"><p>female</p>
+</td><td colspan="1" rowspan="1"><p>headache</p>
+</td><td colspan="1" rowspan="1"><p>ct scan without contrast materials</p>
+</td></tr>
+</table>
+<p>Be sure to <em>also</em> try any of the above tests, but with a missing field.  The app should require you to enter a value for each field (without doing any <em>additional</em> sanity checking, though).</p>
+<h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
+<h3 is-upgraded>I see this when trying to run the demo: <code>npm ERR! code ENOENT</code></h3>
+<aside class="warning"><p>Be sure you run <code>npm install</code> inside the <code>demo-auc-app</code> directory that you cloned from git.  After that completes, <em>then</em> run <code>npm run demo</code> and visit <a href="http://localhost:3001" target="_blank">http://localhost:3001</a>.</p>
+</aside>
+<h3 is-upgraded>This site can&#39;t be reached.</h3>
+<aside class="warning"><p>Be sure you ran <code>npm run demo</code> to start the local server before visiting the app at <a href="http://localhost:3001" target="_blank">http://localhost:3001</a>.</p>
+</aside>
+<h3 is-upgraded>This site can&#39;t provide a secure connection.</h3>
+<aside class="warning"><p>You may have typed <code>https</code> instead of <code>http</code> in the URL.  You must use <code>http</code> for this.</p>
+</aside>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Enable SMART launch" duration="60">
+        <p>With the <a href="https://www.hl7.org/fhir/smart-app-launch/" target="_blank">SMART App Launch Framework</a>, the app will be able to securely read data from the EHR using the credentials of the clinician (through OAuth2 openid connect).  The provider will not need to remember a separate username and password to use the app anymore, and the app will be able to pre-load form fields using the available context in the EHR.</p>
+<p>This will reduce user errors, save the user time, and spare them some frustrations.</p>
+<h2 is-upgraded>SMART Launch Documentation</h2>
+<p>There is a very handy javascript library to enable easy configuration of SMART launches from the app.<br><a href="http://docs.smarthealthit.org/client-js/" target="_blank">http://docs.smarthealthit.org/client-js/</a></p>
+<h3 is-upgraded>EXERCISE 1</h3>
+<aside class="special"><p>Consult the link above, and create a <code>launch.html</code> endpoint.</p>
+</aside>
+<p>Confused?  Part of the goal of this codelab is to get you familiar with using the documentation, so there will be minimal hand-holding throughout.</p>
+<p>Here are a couple of hints, in case this seems like a vague request.</p>
+<ul>
+<li>You may need to use the <code>npm</code> command to install the library.</li>
+<li>Once installed, you will want to create an endpoint ‘page&#39; for use in a browser using the ‘As Library&#39; approach, rather than the ‘As Module&#39; approach.</li>
+</ul>
+<p>TODO: reveal a solution <code>launch.html</code> endpoint and confirm that student solution is correct.</p>
+<ul>
+<li>Are the scopes correct?</li>
+<li>What is the value of the client_id (AND WHAT SHOULD IT BE???)</li>
+</ul>
+<p>More information about scopes.<br><a href="http://www.hl7.org/fhir/smart-app-launch/scopes-and-launch-context/index.html" target="_blank">http://www.hl7.org/fhir/smart-app-launch/scopes-and-launch-context/index.html</a></p>
+<h2 is-upgraded>The SMART App Launcher</h2>
+<p>To test the new launch endpoint, we can use a free, open source tool called the SMART App Launcher.<br><a href="http://launch.smarthealthit.org/" target="_blank">http://launch.smarthealthit.org/</a></p>
+<p>EXERCISE: Visit the site and enter the path to your <code>launch.html</code> endpoint.  Click the green Launch App button to test.</p>
+<h3 is-upgraded>Troubleshooting &amp; Caveats</h3>
+<p>PROBLEM: I only see a white screen.</p>
+<p>ANSWER: You may have entered an <code>https</code>, rather than an <code>http</code>, endpoint url.  Try changing it to <code>http</code>.</p>
+<ul>
+<li>EXERCISE: Add SMART launch url to the app</li>
+<li>TODO: Outline the requirements for pre-populating the age and gender in form.</li>
+<li>TODO: Link to the SMART launch documentation.</li>
+<li>EXERCISE: Complete the SMART launch</li>
+<li>EXERCISE: Extract the patient and provider from the client</li>
+<li>TODO: Provide the code to apply the data to the form</li>
+<li>TEST: Ask user to launch from SMART App Launcher with a default patient, default provider, both, neither, etc.</li>
+<li>EXERCISE: Remove legacy login code.</li>
+</ul>
+<h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Write a CDS hook" duration="90">
+        <p>Outline</p>
+<ul>
+<li>TODO: Show the design goals.</li>
+<li>TODO: Link to the CDS hooks documentation.</li>
+<li>TODO: Explain the discovery endpoint.</li>
+<li>EXERCISE: Ask user to write a new discovery endpoint.</li>
+<li>TODO: Introduce the CDS Hooks Sandbox</li>
+<li>EXERCISE: Ask user to add their service in the sandbox.</li>
+<li>TODO: Link to the Cards documentation</li>
+<li>TODO: Provide the refactored auc.js code.</li>
+<li>EXERCIES: Ask user to insert it, removing old code.</li>
+<li>TODO: Provide a simple template card</li>
+<li>EXERCISE: Add severity &amp; custom icon to the card.</li>
+<li>TEST: Ask user to trigger the app by selecting certain criteria in the sandbox.</li>
+</ul>
+<h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="SMART Web Messaging" duration="60">
+        <p>Outline</p>
+<ul>
+<li>TODO: introduce the design goals (show pictures of the wanted UI).</li>
+<li>TODO: link to the documentation.<br><a href="https://github.com/smart-on-fhir/smart-web-messaging" target="_blank">https://github.com/smart-on-fhir/smart-web-messaging</a></li>
+<li>EXERCISE: Serialize the draft order, saving into the card.link.appContext</li>
+<li>EXERCISE: Ask user to deserialize the draft order in the index.html client context</li>
+<li>TODO: Provide the code to update the html using the client context</li>
+<li>TODO: Link to the SMART Web Messaging docs</li>
+<li>EXERCISE: Ask user to implement the closeApp function using window.postMessage</li>
+<li>TODO: provide the code to apply auc logic to the form (the Evaluate button)</li>
+<li>EXERCISE: Ask user to implement the updateApp function</li>
+<li>TEST: confirm that updates in the launched app update the cds hooks sandbox</li>
+</ul>
+<h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Bonus Exercies" duration="0">
+        <p>These are optional exercises that you are welcome to take on, if you chose.</p>
+<h2 is-upgraded><code>auc.js</code></h2>
+<p>Update the logic to include more criteria.</p>
+<h2 is-upgraded>App Client Refresh</h2>
+<p>When the app gets a token from the SMART launch API, that token eventually will timeout.  The UI could give the user an option to request a refresh before it expires, or at least indicate in the UI when the token has expired (with a message like &#34;EHR token has expired - please reload&#34;).</p>
+<h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
+
+
+      </google-codelab-step>
+    
       <google-codelab-step label="Codelab Examples" duration="0">
         <h2 class="checklist" is-upgraded>What You&#39;ll Learn</h2>
 <ul class="checklist">
@@ -138,6 +405,9 @@
   &lt;li&gt;Example item 2&lt;/li&gt;
 &lt;/dd&gt;&lt;/dl&gt;
 </code></pre>
+<h3 is-upgraded>IMPORTANT!</h3>
+<aside class="warning"><p>Unfortunately, the background color value (<code>#cfe2f3</code>) is a <em>magic</em> attribute value.  Without this <em>exact</em> color value, the Survey object will not work as intended.</p>
+</aside>
 <h2 is-upgraded>Download buttons</h2>
 <p>You can create a special button to Download something (like a tagged github repo).<br><a href="https://github.com/microsoft-healthcare-madison/demo-auc-app/archive/v3.0.zip" target="_blank">Download v3.0</a></p>
 <aside class="warning"><p>This currently doesn&#39;t work with the <code>claat</code> tool!  Instead the ‘button&#39; is shown as a download link.</p>
@@ -145,9 +415,9 @@
 <h2 is-upgraded>Embedded iframes</h2>
 <p>You can embed an iframe in a codelab by setting the <code>alt</code> attribute of an <code>img</code> element.</p>
 <h3 is-upgraded>Example: embedded <code>https://glitch.com/~howoldisit</code></h3>
-<iframe class="embedded-iframe" src="https://glitch.com/~howoldisit"></iframe>
+<iframe class="embedded-iframe" src="https://glitch.com/embed/#!/embed/jewel-chevre?path=package.json&previewSize=100"></iframe>
 <h3 is-upgraded><code>codelab markdown</code></h3>
-<pre><code>&lt;img alt=&#34;https://glitch.com/~howoldisit&#34; /&gt;
+<pre><code>![https://glitch.com/embed/#!/embed/jewel-chevre?path=package.json&amp;previewSize=100](Glitch iframe)
 </code></pre>
 <h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
 <ul class="faq">
@@ -181,219 +451,6 @@
 - good
 - bye
 </code></pre>
-
-
-      </google-codelab-step>
-    
-      <google-codelab-step label="Introduction" duration="10">
-        <p><strong>Welcome, student!</strong></p>
-<p>This codelab is intended to teach you about the SMART launch API, CDS Hooks, and SMART Web Messaging by walking you through a coding exercise that uses those technologies.</p>
-<h3 is-upgraded>Profile Audience</h3>
-<p>This guide is intended for programmers who wish to learn by doing.  You should already have a working knowledge of web app programing, access to a development machine, and about 2 to 4 total hours to dedicate to completing the whole codelab.</p>
-<h3 is-upgraded>Prerequisites</h3>
-<p>This guide assumes you are already familiar with javascript and are comfortable with web programming concepts.  It also helps to understand the basics of <code>git</code>, but there will be example commands throughout to help you if you are new.  The provided codebase uses <code>javascript</code>, <code>node</code>, <code>npn</code>, and <code>express</code> - so some prior experience with those tools will be helpful, but is not required.  You are also free to re-write whole portions of the code in whatever framework you like (and please feel free to share your work with us)!</p>
-<h3 is-upgraded>Major Milestones</h3>
-<p>You will start with an already-implemented form-entry app that evaluates the appropriateness of a potential advanced imaging order and displays a rating of either <code>appropriate</code>, <code>not-appropriate</code>, or <code>no-guidelines-apply</code>.</p>
-<ul>
-<li>v1: Make the app SMART-launch capable, enabling an EHR to launch it.</li>
-<li>v2: Create a CDS hook service to evaluate a <em>draft</em> order in an EHR, and show a link to the SMART app.</li>
-<li>v3: Enable the SMART app to update the draft order inside the EHR.</li>
-</ul>
-
-
-      </google-codelab-step>
-    
-      <google-codelab-step label="PAMA" duration="20">
-        <p><strong>PAMA - Protecting Access to Medicare Act of 2014</strong></p>
-<p><em>&#34;If we in the United States could lower the prices and per-capita volumes of our CT scans, MRIs, and just the top 25 high-volume-high-price surgical procedures to those of the Netherlands, for example, we would see savings of about $425 per capita, or a total of $137 billion.&#34;</em></p>
-<p><a href="https://en.wikipedia.org/wiki/Ezekiel_Emanuel" target="_blank"><strong>Ezekiel Emanuel</strong></a><strong>, on an </strong><a href="https://jamanetwork.com/journals/jama/article-abstract/2674671" target="_blank"><strong>article published in JAMA, March 2018</strong></a></p>
-<h3 is-upgraded>Note</h3>
-<p>This section has <em>lots</em> of background which explains <em>why</em> the <a href="https://www.cms.gov/Medicare/Medicare-Fee-for-Service-Payment/ClinicalLabFeeSched/PAMA-Regulations" target="_blank">PAMA</a> imaging use case was chosen for this exercise.  If you aren&#39;t interested in PAMA, and are here purely to learn the technology, you can skip ahead to the next section.  However, it might help to take at least <em>a few</em> minutes to skim this material, just to get the gist of what problem is being solved.</p>
-<h3 is-upgraded><em>Warp</em> Ahead</h3>
-<p>If you already have a good grasp of the SMART launch process, and you would like to do a lot more than <em>skip</em> ahead, you can <strong>warp</strong> ahead and begin the process at CDS hook implementation by checking out the code at <code>v2.0</code> in the repo and jump to <a href="Write A CDS Hook" target="_blank">section v2</a>.<br>TODO: get the section link working for the [section 2] link above.</p>
-<p>There&#39;s even an analogous git tag which will give you the <strong>final</strong> solution at <code>v3.0</code>.  This is fine if you just want to quickly have a working copy of the app to play with, but if you&#39;re here to learn - I recommend finding time to do the full codelab.</p>
-<h2 is-upgraded>PAMA</h2>
-<p>New PAMA imaging requirements are taking effect, starting on January 1st, 2020.  The American College of Radiology has put out some very helpful media to explain why this is important, which I recommend checking out for a few minutes.</p>
-<h3 is-upgraded>Links</h3>
-<ul>
-<li><a href="https://www.acr.org/-/media/ACR/Files/Clinical-Resources/Clinical-Decision-Support/RSCAN-PAMA_flyer.pdf?la=en" target="_blank">https://www.acr.org/-/media/ACR/Files/Clinical-Resources/Clinical-Decision-Support/RSCAN-PAMA_flyer.pdf?la=en</a></li>
-<li><a href="https://www.acr.org/Clinical-Resources/Clinical-Decision-Support" target="_blank">https://www.acr.org/Clinical-Resources/Clinical-Decision-Support</a></li>
-</ul>
-<h3 is-upgraded>PAMA Timeline</h3>
-<h4 is-upgraded>2020</h4>
-<p>Starting in 2020, providers in the US who order diagnostic advanced imaging (CT, MRI, nuclear medicine, and PET scans) will need to provide <em>evidence</em> that they have consulted <em>best practice guidelines</em> for appropriate use of that technology <em>while they are still at the point of order entry</em>.</p>
-<h4 is-upgraded>2021</h4>
-<p>Failure to submit a claim for imaging that has this evidence, starting in 2021, may <em>prevent</em> reimbursement (for Medicare part B claims) for furnishing providers (who are typically radiologists).</p>
-<h4 is-upgraded>2022</h4>
-<p>Ordering providers who have a <em>consistently</em> poor history of ordering &#34;low value&#34; diagnosic imaging may then be subject to mandatory prior authorization before placing image orders for Medicare patients starting in 2022.  Some of those rules are TBD, depending on how the first two years go, though.</p>
-<h3 is-upgraded>Apropriate Use Criteria (AUC)</h3>
-<p>In short, for software to determine whether an imaging technique is <em>apropriate</em> or not for a given diagnosis, several groups of specialists have been developing <em>apropriate use criteria</em> and publishing that criteria for the industry to adopt into the EHR workflow.  These AUC are regularly improved, updated, and re-published.</p>
-<p>TODO: inline-link to AUC above</p>
-<h3 is-upgraded>Qualified CDS Mechanisms (QCDSM)</h3>
-<p>The software providers who use this criteria, the QCDSM vendors, must provide access to best practice guidelines for a wide spectrum of medical care areas.  For PAMA imaging, we are interested in the radiology imaging AUC and we have prepared a simple example of QCDSM guideline consultation software.  However, a QCDSM must use more than one published set of AUC in their software, and have a method of updating their AUC periodically.  As such, the software can be quite complex, and is often implemented as a stand-alone web service.</p>
-<p>TODO: inline-link to the list of QCDSMs</p>
-<h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
-<h3 is-upgraded>Quesion</h3>
-<p>Why are CDS Hooks important for PAMA?</p>
-<h3 is-upgraded>Answer</h3>
-<p>To satisfy radiologist claims to CMS, the original order must include evidence that guidelines were consulted at the point of order entry.  This means, while the provider is still using the EHR, they must also be consulting a guideline app.  By using CDS Hooks, we can provide a link to the app as soon as it&#39;s relevant to them (like when they&#39;re placing an order for advanced imaging).</p>
-<h3 is-upgraded>Question</h3>
-<p>Why is SMART Web Messaging important for PAMA?</p>
-<h3 is-upgraded>Answer</h3>
-<p>Because the logic to determine when a service is or isn&#39;t appropriate is complex, these are often implemented in stand-alone web-based applications.  To enable those applications to <strong>update</strong> the currently draft order, we need SMART Web Messaging.  With SMART Web Messagine we can send data and actions back into the EHR, securely and easily.</p>
-
-
-      </google-codelab-step>
-    
-      <google-codelab-step label="Exercise Outline" duration="5">
-        <p>You are provided with a very simple, but working, guideline consultation app.  In PAMA parlance, this would be software from a Qualified CDS Mechanism, or a QCDSM.</p>
-<p>TODO: insert a screenshot of the starting app.</p>
-<h2 is-upgraded>SMART Launch</h2>
-<p>You will add SMART launch capabilities to the app, allowing it to be launched by the EHR and to receive EHR data directly through the SMART launch client.</p>
-<p>TODO: insert a screenshot of the app, pre-populated with patient demographic data.</p>
-<h2 is-upgraded>CDS Hooks</h2>
-<p>Once the app is capable of a SMART launch, you will write a CDS Hook service to alert ordering providers when they have made an order selection that is outside of guidelines.  The alert will give them a helpful link to click on, which will launch the app <em>within the EHR</em>.  The app will read context from the EHR and use that to pre-populate the appropriate fields in its form, saving the clinician time and mental effort.</p>
-<p>TODO: insert some images of the cards</p>
-<h2 is-upgraded>SMART Web Messaging</h2>
-<p>Finally, a new button will be added in the app that will be able to update the draft order items with the current selection.  Upon update, evidence of guideline consultation will be attached to the order, before closing the app, returning the user to the order entry screen in the EHR.</p>
-<p>TODO: insert an image of the embedded app.</p>
-<h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
-<p>QUESTION: Which EHRs currently support the technologies required to enable these services?</p>
-<p>ANSWER: Currently, Epic and T-System have implemented the required CDS hooks to enable this.  Cerner has committed to doing this, though, and it&#39;s not a matter of if, but of when.</p>
-
-
-      </google-codelab-step>
-    
-      <google-codelab-step label="Prerequisites" duration="5">
-        <p>This guide assumes you already know some javascript and are familiar with web programming concepts.  It helps to be familiar with <code>git</code>, even though most <code>git</code> commands are provided when needed.</p>
-<p>You must have a development machine the following installed:</p>
-<ul>
-<li><code>git</code></li>
-<li><code>node</code></li>
-<li><code>npm</code></li>
-</ul>
-<p>TODO: link to guides for installing node, npm, and git.</p>
-<h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
-<h3 is-upgraded>Question</h3>
-<p>How do I install X?</p>
-<h3 is-upgraded>Answer</h3>
-<ul>
-<li><code>git</code>: <a href="https://git" target="_blank">download</a></li>
-<li><code>node</code>: <a href="https://node" target="_blank">download</a></li>
-<li><code>npm</code>: <a href="https://npm" target="_blank">download</a></li>
-</ul>
-<p>TODO: set these links</p>
-<p>QUESTION: Can I use a virtual machine to do this?</p>
-<p>ANSWER: Yes!<br>TODO: can a pool of virtual machines in azure be allocated for this???</p>
-
-
-      </google-codelab-step>
-    
-      <google-codelab-step label="Getting Started" duration="15">
-        <pre><code>git checkout --orphan demo ...  # TODO: get the right command here
-cd demo-auc-app
-npm install
-</code></pre>
-<p>TODO: insert a screenshot of this command line sequence working</p>
-<p>The demo app is now ready to be started using this command</p>
-<pre><code>npm run server  # TODO: confirm this
-</code></pre>
-<p>To view the app, visit this URL: <a href="http://localhost:3000" target="_blank">http://localhost:3000</a></p>
-<p>EXERCISE: what is the rating of the following combination of demographics</p>
-<ul>
-<li>4yo, male, lower back pain, and lumbar spine CT</li>
-<li>98yo, female, congenitive heart failure, cardiac mri</li>
-<li>29yo, female, headache, ct scan without contrast materials</li>
-<li>any of the above with a missing field</li>
-</ul>
-<h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
-<h3 is-upgraded>Question</h3>
-<h3 is-upgraded>Answer</h3>
-
-
-      </google-codelab-step>
-    
-      <google-codelab-step label="Enable SMART launch" duration="60">
-        <p>With the SMART launch API, the app will be able to securely read data from the EHR using the credentials of the clinician.  The provider will not need to remember a separate username and password to use the app anymore, and the app will be able to pre-load form fields using the available context in the EHR.</p>
-<p>This will reduce user errors, save the user time, and spare them some frustrations.</p>
-<h2 is-upgraded>SMART Launch Documentation</h2>
-<p>TODO: make sure the launch <code>state</code> value is being used appropriately in demo code. :B<br><a href="http://www.hl7.org/fhir/smart-app-launch/#app-protection" target="_blank">http://www.hl7.org/fhir/smart-app-launch/#app-protection</a></p>
-<p>There is a very handy javascript library to enable easy configuration of SMART launches from the app.<br><a href="http://docs.smarthealthit.org/client-js/" target="_blank">http://docs.smarthealthit.org/client-js/</a></p>
-<p>EXERCISE: Consult the link above, and create a <code>launch.html</code> endpoint.</p>
-<p>TODO: reveal a solution <code>launch.html</code> endpoint and confirm that student solution is correct.</p>
-<ul>
-<li>Are the scopes correct?</li>
-<li>What is the value of the client_id (AND WHAT SHOULD IT BE???)</li>
-</ul>
-<p>More information about scopes.<br><a href="http://www.hl7.org/fhir/smart-app-launch/scopes-and-launch-context/index.html" target="_blank">http://www.hl7.org/fhir/smart-app-launch/scopes-and-launch-context/index.html</a></p>
-<h2 is-upgraded>The SMART App Launcher</h2>
-<p>To test the new launch endpoint, we can use a free, open source tool called the SMART App Launcher.<br><a href="http://launch.smarthealthit.org/" target="_blank">http://launch.smarthealthit.org/</a></p>
-<p>EXERCISE: Visit the site and enter the path to your <code>launch.html</code> endpoint.  Click the green Launch App button to test.</p>
-<h3 is-upgraded>Troubleshooting &amp; Caveats</h3>
-<p>PROBLEM: I only see a white screen.</p>
-<p>ANSWER: You may have entered an <code>https</code>, rather than an <code>http</code>, endpoint url.  Try changing it to <code>http</code>.</p>
-<ul>
-<li>EXERCISE: Add SMART launch url to the app</li>
-<li>TODO: Outline the requirements for pre-populating the age and gender in form.</li>
-<li>TODO: Link to the SMART launch documentation.</li>
-<li>EXERCISE: Complete the SMART launch</li>
-<li>EXERCISE: Extract the patient and provider from the client</li>
-<li>TODO: Provide the code to apply the data to the form</li>
-<li>TEST: Ask user to launch from SMART App Launcher with a default patient, default provider, both, neither, etc.</li>
-<li>EXERCISE: Remove legacy login code.</li>
-</ul>
-<h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
-
-
-      </google-codelab-step>
-    
-      <google-codelab-step label="Write a CDS hook" duration="90">
-        <p>Outline</p>
-<ul>
-<li>TODO: Show the design goals.</li>
-<li>TODO: Link to the CDS hooks documentation.</li>
-<li>TODO: Explain the discovery endpoint.</li>
-<li>EXERCISE: Ask user to write a new discovery endpoint.</li>
-<li>TODO: Introduce the CDS Hooks Sandbox</li>
-<li>EXERCISE: Ask user to add their service in the sandbox.</li>
-<li>TODO: Link to the Cards documentation</li>
-<li>TODO: Provide the refactored auc.js code.</li>
-<li>EXERCIES: Ask user to insert it, removing old code.</li>
-<li>TODO: Provide a simple template card</li>
-<li>EXERCISE: Add severity &amp; custom icon to the card.</li>
-<li>TEST: Ask user to trigger the app by selecting certain criteria in the sandbox.</li>
-</ul>
-<h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
-
-
-      </google-codelab-step>
-    
-      <google-codelab-step label="SMART Web Messaging" duration="60">
-        <p>Outline</p>
-<ul>
-<li>TODO: introduce the design goals (show pictures of the wanted UI).</li>
-<li>TODO: link to the documentation.<br><a href="https://github.com/smart-on-fhir/smart-web-messaging" target="_blank">https://github.com/smart-on-fhir/smart-web-messaging</a></li>
-<li>EXERCISE: Serialize the draft order, saving into the card.link.appContext</li>
-<li>EXERCISE: Ask user to deserialize the draft order in the index.html client context</li>
-<li>TODO: Provide the code to update the html using the client context</li>
-<li>TODO: Link to the SMART Web Messaging docs</li>
-<li>EXERCISE: Ask user to implement the closeApp function using window.postMessage</li>
-<li>TODO: provide the code to apply auc logic to the form (the Evaluate button)</li>
-<li>EXERCISE: Ask user to implement the updateApp function</li>
-<li>TEST: confirm that updates in the launched app update the cds hooks sandbox</li>
-</ul>
-<h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
-
-
-      </google-codelab-step>
-    
-      <google-codelab-step label="Bonus Exercies" duration="0">
-        <p>These are optional exercises that you are welcome to take on, if you chose.</p>
-<h2 is-upgraded><code>auc.js</code></h2>
-<p>Update the logic to include more criteria.</p>
-<h2 is-upgraded>App Client Refresh</h2>
-<p>When the app gets a token from the SMART launch API, that token eventually will timeout.  The UI could give the user an option to request a refresh before it expires, or at least indicate in the UI when the token has expired (with a message like &#34;EHR token has expired - please reload&#34;).</p>
-<h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
 
 
       </google-codelab-step>
