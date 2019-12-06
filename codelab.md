@@ -1,5 +1,5 @@
 summary: Demo EHR Integrated AUC Guideline Consultation App
-id: demo-auc-app
+id: docs
 categories: cds-hoooks smart smart-web-messaging
 environments: Web
 status: Draft
