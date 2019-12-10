@@ -3,13 +3,13 @@
   "format": "html",
   "prefix": "https://storage.googleapis.com",
   "mainga": "UA-49880327-14",
-  "updated": "2019-12-06T14:04:29-06:00",
-  "id": "demo-auc-app",
+  "updated": "2019-12-06T16:15:38-06:00",
+  "id": "docs",
   "duration": 265,
   "title": "Embed an External AUC Guideline Consultation App Into an EHR",
   "authors": "Carl Anderson",
   "summary": "Demo EHR Integrated AUC Guideline Consultation App",
-  "source": "../../../madison-healthcare-madison/demo-auc-app/codelab.md",
+  "source": "codelab.md",
   "theme": "",
   "status": [
     "draft"
@@ -22,5 +22,5 @@
     "web"
   ],
   "feedback": "https://github.com/microsoft-healthcare-madison/demo-auc-app/issues",
-  "url": "demo-auc-app"
+  "url": "docs"
 }
