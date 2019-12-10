@@ -174,7 +174,7 @@ You must have a development machine with the following:
 | `npm` | [Download](https://nodejs.org/en/download/) | Needed to install the server dependencies and run it locally. |
 
 Positive
-: This guide was developed using `node v11.0.0`, but any version higher than that should also work.
+: This guide was developed using `node v12.13.1`, which is the current [LTS](https://en.wikipedia.org/wiki/Long-term_support) release.
 
 ### Links
 - <https://www.sitepoint.com/quick-tip-multiple-versions-node-nvm/>
@@ -246,12 +246,25 @@ Negative
 Negative
 : You may have typed `https` instead of `http` in the URL.  You must use `http` for this.
 
+#### Error: listen EADDRINUSE: address already in use 0.0.0.0:8899
+
+Negative
+: It looks like you are attempting to run the server twice, or another service is already using that port number.  You can adjust the port number in your `package.json` file or stop the other running process holding a lock on that port.
+
 ## Enable SMART Launch
 Duration: 30
 
-With the [SMART App Launch Framework](https://www.hl7.org/fhir/smart-app-launch/), the app will be able to securely read data from the EHR using the credentials of the clinician (through OAuth2 openid connect).  The provider will not need to remember a separate username and password to use the app anymore, and the app will be able to pre-load form fields using the available context in the EHR.
+### Problem
+Negative
+: It is time consuming, error-prone, and frustrating for providers when they have to switch focus to a browser window outside of the EHR, remember a URL so they can launch an external app, remember their correct username and password, and then enter patient demographic information to perform some basic task.
 
+### Solution
+<dt>Positive</dt>
+<div>
+The SMART Launch Framework can dramatically improve the situation!<br>
+With the [SMART App Launch Framework](https://www.hl7.org/fhir/smart-app-launch/), the app will be able to securely read data from the EHR using the credentials of the clinician (through OAuth2 openid connect).  The provider will not need to remember a separate username and password to use the app anymore, and the app will be able to pre-load form fields using the available context in the EHR.<br>
 This will reduce user errors, save the user time, and spare them some frustrations.
+</div>
 
 ### SMART Launch Documentation
 
@@ -274,6 +287,7 @@ Here are a couple of hints, in case this seems like a vague request.
 <div>SPOILER
 This is *one* possible solution.
 IGNORE THIS: if you want the experience of implementing it yourself.
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 ```html
 <!-- launch.html -->
 <!DOCTYPE html>
@@ -308,6 +322,7 @@ Some hints:
 
 <dt>negative</dt>
 <div>SPOILER
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 Add this to `package.json`
 ```json
 ...
@@ -322,8 +337,10 @@ npm install http-server
 npm run launch
 ```
 
-You should now be able to visit <http://localhost:8899> to have it launch the app, bypassing the login screen.
 </div>
+
+### Success!
+You should now be able to visit <http://localhost:8899> to have it launch the app, bypassing the login screen.
 
 ## Test SMART Launch
 Duration: 5
@@ -374,13 +391,125 @@ Negative
 ## Using the SMART Launch Client
 Duration: 20
 
-- TODO: Outline the requirements for pre-populating the age and gender in form.
-- TODO: Link to the SMART launch documentation.
-- EXERCISE: Complete the SMART launch
-- EXERCISE: Extract the patient and provider from the client
-- TODO: Provide the code to apply the data to the form
-- TEST: Ask user to launch from SMART App Launcher with a default patient, default provider, both, neither, etc.
-- EXERCISE: Remove legacy login code.
+### Problem
+
+Negative
+: The SMART Launch Framework is now successfully in place!  However, the form HTML needs to be modified in order to take advantage of the EHR context.
+
+### Solution
+
+Positive
+: Modify `index.html` to read context from the SMART Launch client object and apply it to the form.
+
+### EXERCISE 1
+
+<dt>Positive</dt>
+<div>Modify the following to include the missing pieces of code, which will enable auto-population of the form data from the SMART Launch client object.
+
+Look for all the `TODO`s in the code and comments below.  You will refer to the documentation often.
+```html
+<!-- index.html -->
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Demo AUC Guidance App</title>
+</head>
+
+<body>
+  <div>
+    <form action="http://localhost:3002/evaluate" method="POST">
+      <input type="hidden" id="provider" name="provider">
+      <table>
+        <caption>Enter Patient Demographics</caption>
+        <tr>
+          <th><label for="gender">Gender</label></th>
+          <td>
+            <select name="gender" required>
+              <option id="male" value="male">Male</option>
+              <option id="female" value="female">Female</option>
+              <option id="other" value="other">Other</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <th><label for="age">Age</label></th>
+          <td><input id="age" name="age" required></td>
+        </tr>
+        <tr>
+          <th><label for="indication">Indication</label></th>
+          <td>
+            <input list="indications" name="indication" required>
+            <datalist id="indications">
+              <option value="13213009">congenital heart disease</option>
+              <option value="25064002">headache</option>
+              <option value="279039007">lower back pain</option>
+              <option value="423341008">optic disc edema</option>
+              <option value="27355003">toothache</option>
+            </datalist>
+          </td>
+        </tr>
+        <tr>
+          <th><label for="procedure">Procedure</label></th>
+          <td>
+            <input list="procedures" name="procedure" required>
+            <datalist id="procedures">
+              <option value="75561">cardiac mri</option>
+              <option value="70450">ct scan - no contrast material</option>
+              <option value="71275">cta - with contrast material</option>
+              <option value="72133">lumbar spine ct scan</option>
+              <option value="70544">mra - head</option>
+            </datalist>
+          </td>
+        </tr>
+      </table>
+      <input type="submit">
+    </form>
+  </div>
+
+  <!-- TODO: import the fhir-client library here as a module (see the docs).-->
+
+  <script>
+    async function getContext(client) {
+      return {
+        patient: 'TODO: read the current patient from the client object',
+        user: 'TODO: read the current provider from the client object',
+      };
+    }
+    function populateForm(context) {
+      const patient = context.patient;
+      const then = new Date(patient.birthDate),
+        now = new Date();
+      const msPerYear = 365.25 * 24 * 60 * 60 * 1000;
+      const age = (now.getTime() - then.getTime()) / msPerYear;
+      document.getElementById('provider').value = context.user.id;
+      document.getElementById('age').value = Math.round(age);
+      document.getElementById(patient.gender).setAttribute('selected', 1);
+    }
+    if (typeof FHIR !== 'undefined') {
+      FHIR.TODO.call.the.ready.function.here  // Hint: find this in the docs.
+        .then(getContext)
+        .then(populateForm)
+        .catch(console.error);
+    }
+  </script>
+</body>
+</html>
+```
+
+You may view the solution in [this PR](https://github.com/microsoft-healthcare-madison/demo-auc-app/commit/dc28f441558ede38a7464483d2596f2f0e6b07ea#diff-eacf331f0ffc35d4b482f1d15a887d3b).
+</div>
+
+### EXERCISE 2
+<dt>negative</dt>
+<div>Confirm that your changes work by SMART-launching the app from the SMART App Launch portal.  You will know you are complete when the form fields are automatically updated to match the patient you select in the patient picker.</div>
+
+### EXERCISE 3 (BONUS)
+<dt>positive</dt>
+<div>Now that the app is capable of a SMART Launch, you can remove lots of the session / authentication logic in `index.js` to simplify things.
+
+Remove the legacy login and authentication code from the existing `index.js` script.</div>
 
 ### Frequently Asked Questions
 

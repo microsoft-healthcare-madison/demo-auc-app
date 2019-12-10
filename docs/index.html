@@ -146,7 +146,7 @@
 </td><td colspan="1" rowspan="1"><p>Needed to install the server dependencies and run it locally.</p>
 </td></tr>
 </table>
-<aside class="special"><p>This guide was developed using <code>node v11.0.0</code>, but any version higher than that should also work.</p>
+<aside class="special"><p>This guide was developed using <code>node v12.13.1</code>, which is the current <a href="https://en.wikipedia.org/wiki/Long-term_support" target="_blank">LTS</a> release.</p>
 </aside>
 <h2 is-upgraded>Links</h2>
 <ul>
@@ -211,13 +211,20 @@ npm install
 <h3 is-upgraded>This site can&#39;t provide a secure connection.</h3>
 <aside class="warning"><p>You may have typed <code>https</code> instead of <code>http</code> in the URL.  You must use <code>http</code> for this.</p>
 </aside>
+<h3 is-upgraded>Error: listen EADDRINUSE: address already in use 0.0.0.0:8899</h3>
+<aside class="warning"><p>It looks like you are attempting to run the server twice, or another service is already using that port number.  You can adjust the port number in your <code>package.json</code> file or stop the other running process holding a lock on that port.</p>
+</aside>
 
 
       </google-codelab-step>
     
       <google-codelab-step label="Enable SMART Launch" duration="30">
-        <p>With the <a href="https://www.hl7.org/fhir/smart-app-launch/" target="_blank">SMART App Launch Framework</a>, the app will be able to securely read data from the EHR using the credentials of the clinician (through OAuth2 openid connect).  The provider will not need to remember a separate username and password to use the app anymore, and the app will be able to pre-load form fields using the available context in the EHR.</p>
-<p>This will reduce user errors, save the user time, and spare them some frustrations.</p>
+        <h2 is-upgraded>Problem</h2>
+<aside class="warning"><p>It is time consuming, error-prone, and frustrating for providers when they have to switch focus to a browser window outside of the EHR, remember a URL so they can launch an external app, remember their correct username and password, and then enter patient demographic information to perform some basic task.</p>
+</aside>
+<h2 is-upgraded>Solution</h2>
+<aside class="special"><p><br>The SMART Launch Framework can dramatically improve the situation!<br><br>With the <a href="https://www.hl7.org/fhir/smart-app-launch/" target="_blank">SMART App Launch Framework</a>, the app will be able to securely read data from the EHR using the credentials of the clinician (through OAuth2 openid connect).  The provider will not need to remember a separate username and password to use the app anymore, and the app will be able to pre-load form fields using the available context in the EHR.<br><br>This will reduce user errors, save the user time, and spare them some frustrations.<br></p>
+</aside>
 <h2 is-upgraded>SMART Launch Documentation</h2>
 <p>There is a very handy javascript library to enable easy configuration of SMART launches from the app.<br><a href="http://docs.smarthealthit.org/client-js/" target="_blank">http://docs.smarthealthit.org/client-js/</a></p>
 <h3 is-upgraded>EXERCISE 1</h3>
@@ -230,7 +237,7 @@ npm install
 <li>You may need to use the <code>npm</code> command to install the library.</li>
 <li>Once installed, you will want to create an endpoint ‘page&#39; for use in a browser using the ‘As Library&#39; approach, rather than the ‘As Module&#39; approach.</li>
 </ul>
-<aside class="warning"><p>SPOILER<br>This is <em>one</em> possible solution.<br>IGNORE THIS: if you want the experience of implementing it yourself.</p>
+<aside class="warning"><p>SPOILER<br>This is <em>one</em> possible solution.<br>IGNORE THIS: if you want the experience of implementing it yourself.<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br></p>
 <pre><code>&lt;!-- launch.html --&gt;
 &lt;!DOCTYPE html&gt;
 &lt;html&gt;
@@ -257,7 +264,7 @@ npm install
 <li>Consider using the <code>http-server</code> package for <code>npm</code> for a simple, easy to set-up, web server.</li>
 <li>Add an entry to your <code>package.json</code> file so you can invoke <code>npm run launch</code> to run the launcher.</li>
 </ul>
-<aside class="warning"><p>SPOILER<br>Add this to <code>package.json</code></p>
+<aside class="warning"><p>SPOILER<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>Add this to <code>package.json</code></p>
 <pre><code>...
   &#34;scripts&#34;: {
     &#34;launch&#34;: &#34;http-server -p 8899 -c-1&#34;,
@@ -267,8 +274,9 @@ npm install
 <pre><code>npm install http-server
 npm run launch
 </code></pre>
-<p>You should now be able to visit <a href="http://localhost:8899" target="_blank">http://localhost:8899</a> to have it launch the app, bypassing the login screen.<br></p>
 </aside>
+<h2 is-upgraded>Success!</h2>
+<p>You should now be able to visit <a href="http://localhost:8899" target="_blank">http://localhost:8899</a> to have it launch the app, bypassing the login screen.</p>
 
 
       </google-codelab-step>
@@ -303,15 +311,113 @@ npm run launch
       </google-codelab-step>
     
       <google-codelab-step label="Using the SMART Launch Client" duration="20">
-        <ul>
-<li>TODO: Outline the requirements for pre-populating the age and gender in form.</li>
-<li>TODO: Link to the SMART launch documentation.</li>
-<li>EXERCISE: Complete the SMART launch</li>
-<li>EXERCISE: Extract the patient and provider from the client</li>
-<li>TODO: Provide the code to apply the data to the form</li>
-<li>TEST: Ask user to launch from SMART App Launcher with a default patient, default provider, both, neither, etc.</li>
-<li>EXERCISE: Remove legacy login code.</li>
-</ul>
+        <h2 is-upgraded>Problem</h2>
+<aside class="warning"><p>The SMART Launch Framework is now successfully in place!  However, the form HTML needs to be modified in order to take advantage of the EHR context.</p>
+</aside>
+<h2 is-upgraded>Solution</h2>
+<aside class="special"><p>Modify <code>index.html</code> to read context from the SMART Launch client object and apply it to the form.</p>
+</aside>
+<h2 is-upgraded>EXERCISE 1</h2>
+<aside class="special"><p>Modify the following to include the missing pieces of code, which will enable auto-population of the form data from the SMART Launch client object.</p>
+<p>Look for all the <code>TODO</code>s in the code and comments below.  You will refer to the documentation often.</p>
+<pre><code>&lt;!-- index.html --&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+
+&lt;head&gt;
+  &lt;meta charset=&#34;utf-8&#34;&gt;
+  &lt;title&gt;Demo AUC Guidance App&lt;/title&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+  &lt;div&gt;
+    &lt;form action=&#34;http://localhost:3002/evaluate&#34; method=&#34;POST&#34;&gt;
+      &lt;input type=&#34;hidden&#34; id=&#34;provider&#34; name=&#34;provider&#34;&gt;
+      &lt;table&gt;
+        &lt;caption&gt;Enter Patient Demographics&lt;/caption&gt;
+        &lt;tr&gt;
+          &lt;th&gt;&lt;label for=&#34;gender&#34;&gt;Gender&lt;/label&gt;&lt;/th&gt;
+          &lt;td&gt;
+            &lt;select name=&#34;gender&#34; required&gt;
+              &lt;option id=&#34;male&#34; value=&#34;male&#34;&gt;Male&lt;/option&gt;
+              &lt;option id=&#34;female&#34; value=&#34;female&#34;&gt;Female&lt;/option&gt;
+              &lt;option id=&#34;other&#34; value=&#34;other&#34;&gt;Other&lt;/option&gt;
+            &lt;/select&gt;
+          &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+          &lt;th&gt;&lt;label for=&#34;age&#34;&gt;Age&lt;/label&gt;&lt;/th&gt;
+          &lt;td&gt;&lt;input id=&#34;age&#34; name=&#34;age&#34; required&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+          &lt;th&gt;&lt;label for=&#34;indication&#34;&gt;Indication&lt;/label&gt;&lt;/th&gt;
+          &lt;td&gt;
+            &lt;input list=&#34;indications&#34; name=&#34;indication&#34; required&gt;
+            &lt;datalist id=&#34;indications&#34;&gt;
+              &lt;option value=&#34;13213009&#34;&gt;congenital heart disease&lt;/option&gt;
+              &lt;option value=&#34;25064002&#34;&gt;headache&lt;/option&gt;
+              &lt;option value=&#34;279039007&#34;&gt;lower back pain&lt;/option&gt;
+              &lt;option value=&#34;423341008&#34;&gt;optic disc edema&lt;/option&gt;
+              &lt;option value=&#34;27355003&#34;&gt;toothache&lt;/option&gt;
+            &lt;/datalist&gt;
+          &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+          &lt;th&gt;&lt;label for=&#34;procedure&#34;&gt;Procedure&lt;/label&gt;&lt;/th&gt;
+          &lt;td&gt;
+            &lt;input list=&#34;procedures&#34; name=&#34;procedure&#34; required&gt;
+            &lt;datalist id=&#34;procedures&#34;&gt;
+              &lt;option value=&#34;75561&#34;&gt;cardiac mri&lt;/option&gt;
+              &lt;option value=&#34;70450&#34;&gt;ct scan - no contrast material&lt;/option&gt;
+              &lt;option value=&#34;71275&#34;&gt;cta - with contrast material&lt;/option&gt;
+              &lt;option value=&#34;72133&#34;&gt;lumbar spine ct scan&lt;/option&gt;
+              &lt;option value=&#34;70544&#34;&gt;mra - head&lt;/option&gt;
+            &lt;/datalist&gt;
+          &lt;/td&gt;
+        &lt;/tr&gt;
+      &lt;/table&gt;
+      &lt;input type=&#34;submit&#34;&gt;
+    &lt;/form&gt;
+  &lt;/div&gt;
+
+  &lt;!-- TODO: import the fhir-client library here as a module (see the docs).--&gt;
+
+  &lt;script&gt;
+    async function getContext(client) {
+      return {
+        patient: &#39;TODO: read the current patient from the client object&#39;,
+        user: &#39;TODO: read the current provider from the client object&#39;,
+      };
+    }
+    function populateForm(context) {
+      const patient = context.patient;
+      const then = new Date(patient.birthDate),
+        now = new Date();
+      const msPerYear = 365.25 * 24 * 60 * 60 * 1000;
+      const age = (now.getTime() - then.getTime()) / msPerYear;
+      document.getElementById(&#39;provider&#39;).value = context.user.id;
+      document.getElementById(&#39;age&#39;).value = Math.round(age);
+      document.getElementById(patient.gender).setAttribute(&#39;selected&#39;, 1);
+    }
+    if (typeof FHIR !== &#39;undefined&#39;) {
+      FHIR.TODO.call.the.ready.function.here  // Hint: find this in the docs.
+        .then(getContext)
+        .then(populateForm)
+        .catch(console.error);
+    }
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p>You may view the solution in <a href="https://github.com/microsoft-healthcare-madison/demo-auc-app/commit/dc28f441558ede38a7464483d2596f2f0e6b07ea#diff-eacf331f0ffc35d4b482f1d15a887d3b" target="_blank">this PR</a>.<br></p>
+</aside>
+<h2 is-upgraded>EXERCISE 2</h2>
+<aside class="warning"><p>Confirm that your changes work by SMART-launching the app from the SMART App Launch portal.  You will know you are complete when the form fields are automatically updated to match the patient you select in the patient picker.</p>
+</aside>
+<h2 is-upgraded>EXERCISE 3 (BONUS)</h2>
+<aside class="special"><p>Now that the app is capable of a SMART Launch, you can remove lots of the session / authentication logic in <code>index.js</code> to simplify things.</p>
+<p>Remove the legacy login and authentication code from the existing <code>index.js</code> script.</p>
+</aside>
 <h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
 
 
