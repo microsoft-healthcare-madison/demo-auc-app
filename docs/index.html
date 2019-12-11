@@ -30,8 +30,9 @@
       <google-codelab-step label="Introduction" duration="10">
         <h2 is-upgraded>Welcome, student!</h2>
 <p>This codelab is intended to teach you about the <a href="http://www.hl7.org/fhir/smart-app-launch/" target="_blank">SMART launch framework</a>, <a href="https://cds-hooks.org/" target="_blank">CDS Hooks</a>, and <a href="https://github.com/smart-on-fhir/smart-web-messaging" target="_blank">SMART Web Messaging</a> by walking you through a coding exercise that uses those technologies.</p>
-<h3 is-upgraded>Profile Audience</h3>
-<p>This guide is intended for programmers who wish to <em>learn by doing</em>.  You should already have a working knowledge of web programing, access to a development machine, and about 2 to 5 total hours to dedicate to completing the whole codelab.  Your completion time will vary based on your familiarity with Javascript, web programming concepts, and the API in general.</p>
+<aside class="special"><h3 is-upgraded>Profile Audience</h3>
+<p>This guide is intended for programmers who wish to <em>learn by doing</em>.  You should already have a working knowledge of web programing, access to a development machine, and about <strong>2 to 5 total hours</strong> to dedicate to completing the whole codelab.<br><br>Your completion time will vary based on your familiarity with Javascript, web programming concepts, and the API in general.<br></p>
+</aside>
 <h3 is-upgraded>Prerequisites</h3>
 <p>This guide assumes you are already familiar with javascript and are comfortable with web programming concepts.  It also helps to know the basics of <code>git</code>, but there will be example commands throughout for convenience.  The provided initial codebase uses <code>javascript</code>, <code>node</code>, <code>nvm</code>, <code>npm</code>, and <code>express</code> - so some prior experience with those tools will be helpful, but not required.  JavaScript in the browser and in Node.js, and the express Web framework for Node.js</p>
 <h3 is-upgraded>Contributing</h3>
@@ -453,6 +454,8 @@ npm run launch
         <p>There will be several important concepts of CDS Hooks that need to be understood to make this service work as intended.  The most logical starting-place, though, is the <a href="https://github.com/cerner/cds-services-tutorial/wiki/Discovery-Endpoint" target="_blank">CDS Hooks discovery endpoint</a>.</p>
 <h2 is-upgraded>Discovery</h2>
 <p>To run a CDS Hooks service, that service must provide a discovery endpoint which describes all the CDS Hooks that your service is interested in.  In this case, we want our service to be posted-to whenever the <code>order-select</code> hook in the EHR is activated.  This will allow the service to process the current order selection and return the desired ‘card&#39; data (which is then displayed by the EHR to the provider).</p>
+<h3 is-upgraded>Documentation</h3>
+<p>You can read more details about the <code>order-select</code> hook here: <a href="https://cds-hooks.org/hooks/order-select/" target="_blank">https://cds-hooks.org/hooks/order-select/</a></p>
 <h2 is-upgraded>EXERCISE</h2>
 <aside class="special"><p>Write a CDS Hooks discovery endpoint in the current codebase.<br><br>It should respond to the <code>order-select</code> hook.<br><br>It should produce (roughly) this output:</p>
 <pre><code>{
@@ -535,18 +538,124 @@ app.get(&#39;/cds-services&#39;, function(request, response) {
 
       </google-codelab-step>
     
-      <google-codelab-step label="CDS Hooks Cards" duration="20">
-        <h3 is-upgraded>CDS Hooks Cards</h3>
-<p>A card can be displayed to the user in several different ways.</p>
+      <google-codelab-step label="AUC Logic" duration="20">
+        <h2 is-upgraded>Problem</h2>
+<aside class="warning"><p>We want the user to be visually alerted in the EHR when they have selected an order where AUC guidelines should be consulted while ordering.  For this to work, the CDS Hooks service must be able to evaluate the pending order against AUC guidelines, so a card of the appropriate severity can be displayed.  However, the logic is all currently available in a separate service.</p>
+</aside>
+<h2 is-upgraded>Solution</h2>
+<aside class="special"><p>We will extract the AUC logic from the other service, making it available as a module to the CDS Hooks service.  Alternatively, if the app had provided an API, the CDS Hooks service could use that API as order items are selected to determine appropriateness.  Either works, but in this case the logic is easy enough to isolate as a module.</p>
+</aside>
+<h2 is-upgraded><code>auc.js</code></h2>
+<p>The following can be loaded by both the app and the CDS Hooks service to determine the appropriateness rating of an order / diagnosis combination.</p>
+<pre><code>// File: auc.js
+const CPT = {
+  _FHIR_CODING_SYSTEM: &#39;http://www.ama-assn.org/go/cpt&#39;,
+  CARDIAC_MRI: &#39;75561&#39;,
+  CT_HEAD_NO_CONTRAST: &#39;70450&#39;,
+  CTA_WITH_CONTRAST: &#39;71275&#39;,
+  LUMBAR_SPINE_CT: &#39;72133&#39;,
+  MRA_HEAD: &#39;70544&#39;,
+};
+
+const SNOMED = {
+  _FHIR_CODING_SYSTEM: &#39;http://snomed.info/sct&#39;,
+  CONGENITAL_HEART_DISEASE: &#39;13213009&#39;,
+  HEADACHE: &#39;25064002&#39;,
+  LOW_BACK_PAIN: &#39;279039007&#39;,
+  OPTIC_DISC_EDEMA: &#39;423341008&#39;,
+  TOOTHACHE: &#39;27355003&#39;
+};
+
+class Criterion {
+  static covers(subset, set) {
+    if (subset.size &gt; set.size) {
+      return false;
+    }
+    for (const member of subset) {
+      if (!set.has(member)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  constructor(appropriate, notAppropriate) {
+    this.appropriate = appropriate.map(x =&gt; new Set(x));
+    this.notAppropriate = notAppropriate.map(x =&gt; new Set(x));
+  }
+
+  getRating(reasons) {
+    if (this.appropriate.filter(s =&gt; Criterion.covers(s, reasons)).length) {
+      return &#39;appropriate&#39;;
+    }
+    if (this.notAppropriate.filter(s =&gt; Criterion.covers(s, reasons)).length) {
+      return &#39;not-appropriate&#39;;
+    }
+    return &#39;no-guidelines-apply&#39;;
+  }
+};
+
+function evaluate(order, reasons) {
+  if (order) {
+    const criterion = criteria[order];
+    if (criterion &amp;&amp; reasons.length) {
+      return criterion.getRating(new Set(reasons));
+    }
+  }
+  return &#39;no-guidelines-apply&#39;;
+}
+
+const criteria = {
+  &#39;no-procedures-for&#39;: new Criterion([[SNOMED.TOOTHACHE]], []),
+  [CPT.CT_HEAD_NO_CONTRAST]: new Criterion([[SNOMED.HEADACHE, SNOMED.OPTIC_DISC_EDEMA]], []),
+  [CPT.MRA_HEAD]: new Criterion([], []),
+  [CPT.CTA_WITH_CONTRAST]: new Criterion([], [[SNOMED.CONGENITAL_HEART_DISEASE]]),
+  [CPT.LUMBAR_SPINE_CT]: new Criterion([], [[SNOMED.LOW_BACK_PAIN]]),
+  [CPT.CARDIAC_MRI]: new Criterion([[SNOMED.CONGENITAL_HEART_DISEASE]], []),
+};
+
+module.exports = {
+  CPT, SNOMED, criteria, evaluate, getRating: Criterion.prototype.getRating,
+};
+</code></pre>
+<h2 is-upgraded>EXERCISE</h2>
+<aside class="warning"><p><em>Instructions</em></p>
 <ul>
-<li>TODO: Link to the Cards documentation</li>
-<li>TODO: Provide the refactored auc.js code.</li>
-<li>EXERCIES: Ask user to insert it, removing old code.</li>
-<li>TODO: Provide a simple template card</li>
-<li>EXERCISE: Add severity &amp; custom icon to the card.</li>
-<li>TEST: Ask user to trigger the app by selecting certain criteria in the sandbox.</li>
+<li>Create the file <code>auc.js</code> using the content above.</li>
+<li>Import the module in your CDS Hooks service.</li>
+<li>Use the imported functionality to determine which appropriate-ness score the current selection has using the currently-selected orders and diagnoses.</li>
 </ul>
+</aside>
+<h2 is-upgraded>EXERCISE (OPTIONAL)</h2>
+<aside class="special"><p>Refactor the old service to remove the AUC logic from it, replacing it with a module import of the new <code>auc.js</code> code.</p>
+</aside>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Playing with Cards" duration="20">
+        <h2 is-upgraded>Problem</h2>
+<aside class="warning"><p>We want the EHR interface to display a card based on selection.  Also, when the current selection is outside of guideline recommendations, that displayed card should be eye-catching.  When the selection is within guidelines, it should be recognizable as ‘good&#39;.</p>
+</aside>
+<h2 is-upgraded>Solution</h2>
+<aside class="special"><p>We&#39;ll implement the cards to change their displayed icon and border color using varying levels of card type.</p>
+</aside>
+<h3 is-upgraded>Design</h3>
+<p>Recall the designed cards from the codelab introduction.</p>
+<p class="image-container"><img alt="example-cards" src="img/1fe46a51076bd238.png"></p>
+<h2 is-upgraded>Documentation</h2>
+<p>You can find lots of information about CDS Hooks cards here:</p>
+<ul>
+<li><a href="https://cds-hooks.org/#cds-cards" target="_blank">https://cds-hooks.org/#cds-cards</a></li>
+<li><a href="https://cds-hooks.org/specification/current/#cds-service-response" target="_blank">https://cds-hooks.org/specification/current/#cds-service-response</a></li>
+<li><a href="https://cds-hooks.org/specification/current/#card-attributes" target="_blank">https://cds-hooks.org/specification/current/#card-attributes</a></li>
+</ul>
+<h3 is-upgraded>CDS Hooks Cards</h3>
+<p>A card can be displayed to the user in several different ways.</p>
 <h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
+<h3 is-upgraded>TODO: populate these as they are asked</h3>
+<aside class="warning"><p>Please ask questions as you think of them!</p>
+</aside>
 
 
       </google-codelab-step>

@@ -33,9 +33,12 @@ Duration: 10
 
 This codelab is intended to teach you about the [SMART launch framework](http://www.hl7.org/fhir/smart-app-launch/), [CDS Hooks](https://cds-hooks.org/), and [SMART Web Messaging](https://github.com/smart-on-fhir/smart-web-messaging) by walking you through a coding exercise that uses those technologies.
 
+<dt>positive</dt>
+<div>
 #### Profile Audience
-
-This guide is intended for programmers who wish to *learn by doing*.  You should already have a working knowledge of web programing, access to a development machine, and about 2 to 5 total hours to dedicate to completing the whole codelab.  Your completion time will vary based on your familiarity with Javascript, web programming concepts, and the API in general.
+<br>This guide is intended for programmers who wish to *learn by doing*.  You should already have a working knowledge of web programing, access to a development machine, and about **2 to 5 total hours** to dedicate to completing the whole codelab.
+<br>Your completion time will vary based on your familiarity with Javascript, web programming concepts, and the API in general.
+</div>
 
 #### Prerequisites
 
@@ -556,6 +559,9 @@ There will be several important concepts of CDS Hooks that need to be understood
 ### Discovery
 To run a CDS Hooks service, that service must provide a discovery endpoint which describes all the CDS Hooks that your service is interested in.  In this case, we want our service to be posted-to whenever the `order-select` hook in the EHR is activated.  This will allow the service to process the current order selection and return the desired 'card' data (which is then displayed by the EHR to the provider).
 
+#### Documentation
+You can read more details about the `order-select` hook here: <https://cds-hooks.org/hooks/order-select/>
+
 ### EXERCISE
 <dt>positive</dt>
 <div>Write a CDS Hooks discovery endpoint in the current codebase.<br>
@@ -655,20 +661,139 @@ Positive
 Negative
 : Please ask questions as you think of them!
 
-## CDS Hooks Cards
+## AUC Logic
 Duration: 20
+
+### Problem
+Negative
+: We want the user to be visually alerted in the EHR when they have selected an order where AUC guidelines should be consulted while ordering.  For this to work, the CDS Hooks service must be able to evaluate the pending order against AUC guidelines, so a card of the appropriate severity can be displayed.  However, the logic is all currently available in a separate service.
+
+### Solution
+Positive
+: We will extract the AUC logic from the other service, making it available as a module to the CDS Hooks service.  Alternatively, if the app had provided an API, the CDS Hooks service could use that API as order items are selected to determine appropriateness.  Either works, but in this case the logic is easy enough to isolate as a module.
+
+### `auc.js`
+The following can be loaded by both the app and the CDS Hooks service to determine the appropriateness rating of an order / diagnosis combination.
+
+```js
+// File: auc.js
+const CPT = {
+  _FHIR_CODING_SYSTEM: 'http://www.ama-assn.org/go/cpt',
+  CARDIAC_MRI: '75561',
+  CT_HEAD_NO_CONTRAST: '70450',
+  CTA_WITH_CONTRAST: '71275',
+  LUMBAR_SPINE_CT: '72133',
+  MRA_HEAD: '70544',
+};
+
+const SNOMED = {
+  _FHIR_CODING_SYSTEM: 'http://snomed.info/sct',
+  CONGENITAL_HEART_DISEASE: '13213009',
+  HEADACHE: '25064002',
+  LOW_BACK_PAIN: '279039007',
+  OPTIC_DISC_EDEMA: '423341008',
+  TOOTHACHE: '27355003'
+};
+
+class Criterion {
+  static covers(subset, set) {
+    if (subset.size > set.size) {
+      return false;
+    }
+    for (const member of subset) {
+      if (!set.has(member)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  constructor(appropriate, notAppropriate) {
+    this.appropriate = appropriate.map(x => new Set(x));
+    this.notAppropriate = notAppropriate.map(x => new Set(x));
+  }
+
+  getRating(reasons) {
+    if (this.appropriate.filter(s => Criterion.covers(s, reasons)).length) {
+      return 'appropriate';
+    }
+    if (this.notAppropriate.filter(s => Criterion.covers(s, reasons)).length) {
+      return 'not-appropriate';
+    }
+    return 'no-guidelines-apply';
+  }
+};
+
+function evaluate(order, reasons) {
+  if (order) {
+    const criterion = criteria[order];
+    if (criterion && reasons.length) {
+      return criterion.getRating(new Set(reasons));
+    }
+  }
+  return 'no-guidelines-apply';
+}
+
+const criteria = {
+  'no-procedures-for': new Criterion([[SNOMED.TOOTHACHE]], []),
+  [CPT.CT_HEAD_NO_CONTRAST]: new Criterion([[SNOMED.HEADACHE, SNOMED.OPTIC_DISC_EDEMA]], []),
+  [CPT.MRA_HEAD]: new Criterion([], []),
+  [CPT.CTA_WITH_CONTRAST]: new Criterion([], [[SNOMED.CONGENITAL_HEART_DISEASE]]),
+  [CPT.LUMBAR_SPINE_CT]: new Criterion([], [[SNOMED.LOW_BACK_PAIN]]),
+  [CPT.CARDIAC_MRI]: new Criterion([[SNOMED.CONGENITAL_HEART_DISEASE]], []),
+};
+
+module.exports = {
+  CPT, SNOMED, criteria, evaluate, getRating: Criterion.prototype.getRating,
+};
+```
+
+### EXERCISE
+<dt>negative</dt>
+<div><em>Instructions</em>
+
+- Create the file `auc.js` using the content above.
+- Import the module in your CDS Hooks service.
+- Use the imported functionality to determine which appropriate-ness score the current selection has using the currently-selected orders and diagnoses.
+
+</div>
+
+### EXERCISE (OPTIONAL)
+Positive
+: Refactor the old service to remove the AUC logic from it, replacing it with a module import of the new `auc.js` code.
+
+## Playing with Cards
+Duration: 20
+
+### Problem
+Negative
+: We want the EHR interface to display a card based on selection.  Also, when the current selection is outside of guideline recommendations, that displayed card should be eye-catching.  When the selection is within guidelines, it should be recognizable as 'good'.
+
+### Solution
+Positive
+: We'll implement the cards to change their displayed icon and border color using varying levels of card type.
+
+#### Design
+Recall the designed cards from the codelab introduction.
+
+![example-cards](docs/img/example_cards.png)
+
+### Documentation
+
+You can find lots of information about CDS Hooks cards here:
+
+- <https://cds-hooks.org/#cds-cards>
+- <https://cds-hooks.org/specification/current/#cds-service-response>
+- <https://cds-hooks.org/specification/current/#card-attributes>
 
 #### CDS Hooks Cards
 A card can be displayed to the user in several different ways.
 
-- TODO: Link to the Cards documentation
-- TODO: Provide the refactored auc.js code.
-- EXERCIES: Ask user to insert it, removing old code.
-- TODO: Provide a simple template card
-- EXERCISE: Add severity & custom icon to the card.
-- TEST: Ask user to trigger the app by selecting certain criteria in the sandbox.
-
 ### Frequently Asked Questions
+
+#### TODO: populate these as they are asked
+Negative
+: Please ask questions as you think of them!
 
 ## SMART Web Messaging
 
