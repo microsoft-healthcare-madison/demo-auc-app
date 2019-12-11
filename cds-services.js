@@ -56,7 +56,7 @@ app.post('/cds-services/demo-auc-app', function(request, response) {
   const rating = auc.evaluate(orders.slice().pop(), reasons);
   const card = cardDetails[rating];
   const label = 'Click to view the source presentation.';
-  const sourceUrl = 'https://docs.google.com/presentation/d/1QT6HWPW1Kix656s8hZzCMY7fgkTEEck0_aApBASc7rk/edit?usp=sharing';
+  const sourceUrl = 'https://microsoft-healthcare-madison.github.io/demo-auc-app';
   const cards = [{
     summary: 'Demo AUC Guideline Consultation App',
     indicator: card.indicator,
