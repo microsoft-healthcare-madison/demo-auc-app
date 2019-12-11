@@ -144,19 +144,22 @@ Once the app is capable of a SMART launch, you will write a CDS Hooks service to
 
 Finally, a new button will be added in the app that will be able to update the draft order items with the current selection.  Upon update, evidence of guideline consultation will be attached to the order, before closing the app, returning the user to the order entry screen in the EHR.
 
-**TODO**: insert an image of the embedded app.
+### Final Product
+
+The final product will look something like this, when running embedded in an iframe in the EHR.
+
+![embedded-app](images/embedded_final_app.png)
+
+By clicking on the 'Update EHR' button, the pending order will be modified to use whatever has been selected in the form.  The iframe will then close and return the user to the EHR order entry screen.
 
 ### Frequently Asked Questions
 
 #### Which EHRs currently support the technologies required to enable these services?
 
 <dt>positive</dt>
-<pre>Currently, very *few* EHR vendors have implemented the required CDS Hooks to enable this (*T-Systems is a notable exception*).  Cerner has committed to doing this, though, and it's not a matter of if, but of when.  Epic is also 'working on it.'
-
-While this may seem like a negative thing, the other way to see the situation is that any QCDSM vendor who is *ready* with product when CDS Hooks *does* become widespread will have the mover's advantage.  Also, there is currently relatively low pressure for an EHR vendor to get 'caught up' with competitors (but that should be changing rapidly in 2020).
-
-In other words, there is still time to get ready!
-
+<pre>Currently, very *few* EHR vendors have implemented the required CDS Hooks or SMART Web Messaging to enable this (*T-Systems is a notable exception*).  Cerner has committed to doing this, though, and it's not a matter of if, but of when.  Epic is also 'working on it.'<br>
+While this may seem like a negative thing, the other way to see the situation is that any QCDSM vendor who is *ready* with product when CDS Hooks *does* become widespread will have the mover's advantage.  Also, there is currently relatively low pressure for an EHR vendor to get 'caught up' with competitors (but that should be changing rapidly in 2020).<br>
+In other words, there is still time for *everyone* to get ready!<br>
 For a list of vendors who support CDS Hooks, please refer to this:
 <https://github.com/argonautproject/cds-hooks/wiki/Readiness-and-Testing-Matrix>
 </pre>
@@ -255,13 +258,13 @@ Negative
 Duration: 30
 
 ### Problem
-Negative
-: It is time consuming, error-prone, and frustrating for providers when they have to switch focus to a browser window outside of the EHR, remember a URL so they can launch an external app, remember their correct username and password, and then enter patient demographic information to perform some basic task.
+<dt>negative</dt>
+<div>It is time consuming, error-prone, and frustrating for providers when they have to switch focus to a browser window outside of the EHR, remember a URL so they can launch an external app, remember their correct username and password, and then enter patient demographic information to perform some basic task.
+</div>
 
 ### Solution
-<dt>Positive</dt>
-<div>
-The SMART Launch Framework can dramatically improve the situation!<br>
+<dt>positive</dt>
+<div>The SMART Launch Framework can dramatically improve the situation!<br>
 With the [SMART App Launch Framework](https://www.hl7.org/fhir/smart-app-launch/), the app will be able to securely read data from the EHR using the credentials of the clinician (through OAuth2 openid connect).  The provider will not need to remember a separate username and password to use the app anymore, and the app will be able to pre-load form fields using the available context in the EHR.<br>
 This will reduce user errors, save the user time, and spare them some frustrations.
 </div>
@@ -513,19 +516,151 @@ Remove the legacy login and authentication code from the existing `index.js` scr
 
 ### Frequently Asked Questions
 
-## Write a CDS Hooks Service
+#### TODO: populate these as they are asked
+Negative
+: Please ask questions as you think of them!
 
+## Write a CDS Hooks Service
 Duration: 90
 
+### Problem
+<dt>negative</dt>
+<div>While it's true that we have improved the situation greatly by giving the app the ability to SMART Launch, we still have not addressed the concern that the provider needs to leave the EHR in order to use the app (after remembering how to find it).<br>
+We also would like to provide a helpful signal to the user whenever it is appropriate to use the app, reducing the chance that the user will forget to consult the app before ordering advanced diagnostic medical imaging.
+</div>
 
-Outline
+### Solution
+Positive
+: Write a CDS Hooks service which will signal the user *inside the EHR order entry screen* to use the app *when needed*, and *provide a helpful link* to make it painless to SMART Launch the app.
 
-- TODO: Show the design goals.
-- TODO: Link to the CDS Hooks documentation.
-- TODO: Explain the discovery endpoint.
-- EXERCISE: Ask user to write a new discovery endpoint.
-- TODO: Introduce the CDS Hooks Sandbox
-- EXERCISE: Ask user to add their service in the sandbox.
+### Documentation
+You can find lots of helpful information on CDS Hooks here:
+
+- Home: <https://cds-hooks.org>
+- HL7 Home: <https://cds-hooks.hl7.org/>
+- Argonaut Home: <https://github.com/argonautproject/cds-hooks>
+- CDS Hooks Tutorial: <https://github.com/cerner/cds-services-tutorial>
+- Swagger API Definition: <http://editor.swagger.io/?url=https://raw.githubusercontent.com/cds-hooks/api/master/cds-hooks.yaml>
+
+### CDS Hooks Overview
+Taken from: <http://cds-hooks.org/>
+![cds-hooks](images/cds_hooks_overview.png)
+
+If you follow the overall flow of CDS Hooks in the diagram above, you can see how the EHR and the CDS Hooks service work together.  But how does the EHR *know* about the CDS Hooks service?
+
+## CDS Hooks Discovery Endpoint
+Duration: 20
+
+There will be several important concepts of CDS Hooks that need to be understood to make this service work as intended.  The most logical starting-place, though, is the [CDS Hooks discovery endpoint](https://github.com/cerner/cds-services-tutorial/wiki/Discovery-Endpoint).
+
+### Discovery
+To run a CDS Hooks service, that service must provide a discovery endpoint which describes all the CDS Hooks that your service is interested in.  In this case, we want our service to be posted-to whenever the `order-select` hook in the EHR is activated.  This will allow the service to process the current order selection and return the desired 'card' data (which is then displayed by the EHR to the provider).
+
+### EXERCISE
+<dt>positive</dt>
+<div>Write a CDS Hooks discovery endpoint in the current codebase.<br>
+It should respond to the `order-select` hook.<br>
+It should produce (roughly) this output:
+```json
+{
+  "services": [
+    {
+      "hook": "TODO: determine from the documentation",
+      "title": "Demo AUC Guidance Consultation - Click to Insert Evidence",
+      "description": "Click to insert evidence of AUC guidance consultation.",
+      "id": "demo-auc-app"
+    }
+  ]
+}
+```
+</div>
+
+<dt>negative</dt>
+<div>SPOILER
+This is *one* way to implement this service using `express`.
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+```js
+// File: cds-services.js
+...
+// Discovery endpoint.
+app.get('/cds-services', function(request, response) {
+ response.json({
+   services: [{
+     hook: 'order-select',
+     title: 'Demo AUC Guidance Consultation - Click to Insert Evidence',
+     description: 'Click to insert evidence of AUC guidance consultation.',
+     id: 'demo-auc-app'
+   }]
+ })
+});
+```
+</div>
+
+### Frequently Asked Questions
+
+#### TODO: populate these as they are asked
+Negative
+: Please ask questions as you think of them!
+
+## CDS Hooks Testing
+Duration: 20
+
+To test and develop your CDS Hooks service, it's recommended to use one of the several freely available sandboxes.  One of the easiest to use is: <https://sandbox.cds-hooks.org/>.
+
+![cds-hooks-sandbox](images/v3_pama_tab.png)
+
+### EXERCISE 1
+<dt>positive</dt>
+<div>**Instructions**
+
+- Select the PAMA Imaging tab, if not already selected.
+- Enter the number `72133` in the 'Search orders' box.  This is a CPT procedure code.
+- Select the auto-suggested 'CT, lumbar spine' order, which should be the only suggestion.
+- Enter `low back pain` in the 'Search reasons' box and select the top result.
+- In the CDS Developer Panel on the right, select the `pama-imaging` service if not already selected.
+- Expand the `Request` and `Response` widgets to observe the input and output messages which were sent *to* the `pama-imaging` service and were received back *from* it, respectively.
+- See what happens to the request and response messages when you delete the currently selected order or reason.
+- See what happens to the request and response messages when you select different services.
+
+</div>
+
+### EXERCISE 2
+<dt>negative</dt>
+<div>**Instructions**
+
+- Delete the selected order and reason, if any are selected.
+- Type `congenital heart` into the 'Search reasons' box and select the top suggestion.
+- Notice how a card has appeared on the left side of the screen.
+- Select the `pama-imaging` service from the drop-down on the right, if not already selected.
+- Observe the structure of the Card definition within the `Response` message in the CDS Developer Panel.  This card was generated *by* the `pama-imaging` CDS service, which is running remotely at <https://fhir-org-cds-services.appspot.com>.
+
+</div>
+
+### EXERCISE 3
+Positive
+: See if you can discover the complete list of CDS Services at <https://fhir-org-cds-services.appspot.com> by modifying the URL (or adding something to it).
+
+### EXERCISE 4
+<dt>negative</dt>
+<div>**Instructions**
+
+- Configure the CDS Hooks Sandbox to use your local CDS Hooks service by providing it with your discovery endpoint (which should be somewhere on `http://localhost`).
+- Change the selected service in the CDS Developer Panel to your new service, which should apear as `demo-auc-app`.
+
+</div>
+
+### Frequently Asked Questions
+
+#### TODO: populate these as they are asked
+Negative
+: Please ask questions as you think of them!
+
+## CDS Hooks Cards
+Duration: 20
+
+#### CDS Hooks Cards
+A card can be displayed to the user in several different ways.
+
 - TODO: Link to the Cards documentation
 - TODO: Provide the refactored auc.js code.
 - EXERCIES: Ask user to insert it, removing old code.
