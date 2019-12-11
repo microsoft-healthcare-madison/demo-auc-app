@@ -126,7 +126,10 @@ Below is an embedded version of the app in its original state.  The idea is that
 
 Feel free to explore the app to get a sense of how it works.  Any non-empty username and password will allow you to use the app - the login is totally fake.
 
-![https://glitch.com/embed/#!/embed/jewel-chevre?path=package.json&previewSize=100](v1)
+### Interactive Demo AUC App
+<dt>positive</dt>
+<div>![https://glitch.com/embed/#!/embed/jewel-chevre?path=package.json&previewSize=100](v1)
+</div>
 
 ## Exercise Outline
 Duration: 5
@@ -224,16 +227,21 @@ You can use any non-empty username and password to log in to the app.
 
 ![login](images/dr_brown_login.png)
 
-### Exercises
-To get you familiar with the app and how it works, please launch the app and use it to rate the following combinations of demographics.
+### EXERCISE
+<dt>positive</dt>
+<div>To get you familiar with the app and how it works, please launch the app and use it to rate the following combinations of demographics.
+
+<dt>negative</dt>
+<div>
 
 | Age | Gender | Indication               | Procedure                          |
 |-----|--------|--------------------------|------------------------------------|
+| Age | Gender | Indication               | Procedure                          |
 | 4   | male   | lower back pain          | lumbar spine CT                    |
 | 98  | female | congenital heart disease | cardiac mri                        |
 | 29  | female | headache                 | ct scan without contrast materials |
-
-Be sure to *also* try any of the above tests, but with a missing field.  The app should require you to enter a value for each field (without doing any *additional* sanity checking, though).
+</div>Be sure to *also* try any of the above tests, but with a missing field.  The app should require you to enter a value for each field (without doing any *additional* sanity checking, though).
+</div>
 
 ### Frequently Asked Questions
 
@@ -277,7 +285,7 @@ This will reduce user errors, save the user time, and spare them some frustratio
 There is a very handy javascript library to enable easy configuration of SMART launches from the app.
 <http://docs.smarthealthit.org/client-js/>
 
-#### EXERCISE 1
+### EXERCISE 1
 Positive
 : Consult the link above, and create a `launch.html` endpoint.
 
@@ -316,7 +324,7 @@ IGNORE THIS: if you want the experience of implementing it yourself.
 More information about scopes can be found here.
 <http://www.hl7.org/fhir/smart-app-launch/scopes-and-launch-context/index.html>
 
-#### EXERCISE 2
+### EXERCISE 2
 
 Positive
 : Make this `launch.html` page available on port `8899` on your local machine.
@@ -356,7 +364,7 @@ Duration: 5
 To test the new launch endpoint, we can use a free, open source tool called the SMART App Launcher.
 <http://launch.smarthealthit.org/>
 
-#### EXERCISE
+### EXERCISE
 
 Positive
 : Visit the site and enter the path to your `launch.html` endpoint.  Click the green Launch App button to test.
@@ -508,7 +516,7 @@ You may view the solution in [this PR](https://github.com/microsoft-healthcare-m
 </div>
 
 ### EXERCISE 2
-<dt>negative</dt>
+<dt>positive</dt>
 <div>Confirm that your changes work by SMART-launching the app from the SMART App Launch portal.  You will know you are complete when the form fields are automatically updated to match the patient you select in the patient picker.</div>
 
 ### EXERCISE 3 (BONUS)
@@ -631,7 +639,7 @@ To test and develop your CDS Hooks service, it's recommended to use one of the s
 </div>
 
 ### EXERCISE 2
-<dt>negative</dt>
+<dt>positive</dt>
 <div>**Instructions**
 
 - Delete the selected order and reason, if any are selected.
@@ -647,7 +655,7 @@ Positive
 : See if you can discover the complete list of CDS Services at <https://fhir-org-cds-services.appspot.com> by modifying the URL (or adding something to it).
 
 ### EXERCISE 4
-<dt>negative</dt>
+<dt>positive</dt>
 <div>**Instructions**
 
 - Configure the CDS Hooks Sandbox to use your local CDS Hooks service by providing it with your discovery endpoint (which should be somewhere on `http://localhost`).
@@ -748,17 +756,20 @@ module.exports = {
 };
 ```
 
-### EXERCISE
-<dt>negative</dt>
-<div><em>Instructions</em>
+### EXERCISE 1
+<dt>positive</dt>
+<div>**Instructions**
 
 - Create the file `auc.js` using the content above.
-- Import the module in your CDS Hooks service.
+- Import the module in your CDS Hooks service (a la `const auc = require('./auc.js');`).
 - Use the imported functionality to determine which appropriate-ness score the current selection has using the currently-selected orders and diagnoses.
 
 </div>
 
-### EXERCISE (OPTIONAL)
+Negative
+: You may struggle here a bit learning how to extract the currently selected order and diagnosis from the current Request message.  Remember that the CDS Developer Panel in the sandbox UI is your friend.
+
+### EXERCISE 2 (OPTIONAL)
 Positive
 : Refactor the old service to remove the AUC logic from it, replacing it with a module import of the new `auc.js` code.
 
@@ -767,7 +778,7 @@ Duration: 20
 
 ### Problem
 Negative
-: We want the EHR interface to display a card based on selection.  Also, when the current selection is outside of guideline recommendations, that displayed card should be eye-catching.  When the selection is within guidelines, it should be recognizable as 'good'.
+: We want the EHR interface to display a card based on selection.  Also, when the current selection is outside of guideline recommendations, the displayed card should be eye-catching.  When the selection is *within* guidelines, it should be recognizable as 'good'.
 
 ### Solution
 Positive
@@ -786,8 +797,79 @@ You can find lots of information about CDS Hooks cards here:
 - <https://cds-hooks.org/specification/current/#cds-service-response>
 - <https://cds-hooks.org/specification/current/#card-attributes>
 
-#### CDS Hooks Cards
-A card can be displayed to the user in several different ways.
+### A Head Start
+The following code snippet will help you get started matching the look of the intended output.
+
+```js
+const cardDetails = {
+  'appropriate': {
+    detail: 'This order meets AUC guidelines.',
+    icon: 'https://lh3.googleusercontent.com/bYNztCIytfV24Hzu9O11XcMhcHdcjRbX0TX2JfxX_LN-tKOOvqQi1lAhmBv7hY8UbMBmshW9vq3jFMO5kbCbq4fTsSWmlccsknxRvtGNunP_IktjIAn38prInj-6f6qWcTk3A9C3kkkJIilgeWOeOy3j8rifvViasCyhm5AGxeBs0TwyLIS-rV7LJDEWI9PjhTPcalYmvZBpl5Yti073BFHlBdMQH98D4CLQle9ZOR8zvXs43NGQdDFRk6QYplv7WFy6veT8b_sGeGxssvPVQoL9Kzcdagd1ftrvsY9vEzm9U79x4u9sBH_kw-BjyJilBh3ZLcTISbuSN-zT3Xn77uOh-aIemSKnr7jl33Ex3i0JyqxMcmj1Wc7cH4sCEHJ7bku3yZYndzVZgjvyPOV44EWo5OyDNVdQ22Hv4LbbSGQku0NCiSbm8g17rb3agKRnjmgioe6kWpa4lH16Q80FuRmAyYZ0GbBJl407qRrmMN-oO9R_LnzIABoV8BPyfU4BvsTDO_GZMBlaoy2K1Qv-0RL9faAjpN6iNQdofpJ28qn07MjJM-vHqPyD3U-eA8RgpSsofQscgE57GrSDDLRhgev3iyhhu2XU4pHbvmd4UUf82a2W0_OYkOlkeiTXM_YdrrW7E2Zpp2pWoIhZJIgXAVuaIz4v6k6EREPeBUuYiAoJHNs-UNXg3cvz=s100-no',
+    indicator: 'success',
+  },
+  'no-guidelines-apply': {
+    detail: 'This order is not specified by AUC guidelines.',
+    icon: 'https://lh3.googleusercontent.com/fLQElMed2CFqAHxwRlIe5gJoHp9PFyZUPEcjgdB2Jj2dL7tHKfg4potyo39gsQeP_6wQ7zkWXaMGR7KnfkDrW1ks0jYaHmMdFi-AUer53CQCkKBwkgIEtgRSlozLDqiqpTBMIGRfsj_6oYtruy8O1cFEI54xSjXGtC3l3HThdk93lOjwbxdmqshbkYvm1XYTNcJuBQBdYgIEJusjX_RDBTvJiAxQ0lBeYSHjGBE8JibvQjLboSqNwefLVbIZ24LUenGoub9Y8mhVlxUeQMQPYclnn5W5Nj509L0Oc65ZAvLhoqAJs_sI6gr7ViJqkgdGfRe2pAXbikX2vBvLRHMktcGD5J_YVYTst5vrvfnhfhE0P-kPSp4XLt4WrfP5OQe7lysg-EFyiK6F7REP7NmiPy8x8hf9O9GuUoPFqXwU4psdoXbuNpCsuPA6tfnU6QwC-vUvzOWJgF1bMpu8NimhqPrOgBAUAHh0eVh9p3_ix8OwKBZ70EX8a7E9mq67k0-rTtMoElwBkFNzArTsMd1xp6QboF0F-oV_Li7xje_7Fokn-nDbB72ULX9K-MVbSkZvhD7Y_hJwQPG6wWF4kHaX_zzZsdD5botGT2VMrF-wGklzRrh2bBS-jT12IAeBECGgO_XKOu3Ire3WQ0SUdYGpE5Ebs4KrWAOykznsL9OqfkVuD1SIwjKgR-A2=s100-no',
+    indicator: 'warning'
+  },
+  'not-appropriate': {
+    detail: 'This order does not meet AUC guidelines.',
+    icon: 'https://lh3.googleusercontent.com/6f3-twVm-TIZr0IWsb4Yuiys58PkeV3RU89XSDjRtV2beBiKxsoSg4-7qNgzLkZZf-Vy-1OoG5pswPQSK8XRuW3lE56wQgkItirK-iBozZMoD5JvcOR6ZxusPjrvMOE-iwaOKYZxnk0qyoDu7W4WQfaTDaGXAL26OuV_VBIxL0SSXzONWCrk70ckTJPzGy7detQTWknOZJNLuLEv0N45q_EoOu6SLgUlf3woVe-zm0JMNV68JsXH5FIlRwidaplY19MnY40If0fGtQkvnrNS4lwZ9pnx_PK_wiTJhhnpfuNRvrhy_Bdphsy_CN0fMj2FfrwhOJl48jlg8IvIkMzDMlEZGthzryIhN2B-94Eq2oNZS9JaAixqLg2P06_HcaVWMi5x6slPMCal_sU78yuta5lNZdxS7XYw9xJWLjW8Mu_LPKoA6m0onGcYLnwYkdXLFvqdF4dWKYOx1uFvPAMOsucST4orXqVTFWFiEm39et-ZUVOArLm9yXh8i4zl5PKTs4sA7c4u8CLwLyW04Unkg59KnL0ZNKX0xRNm052pW_WhX2g48oKjPIqnQ6Zl1omgNgzIyHo2mvpIKstENpGJwsIqNO456kWEbgUmydTZn40d-VdG47d5Xg5R0jl-WGrK_FbG8u0DupeeCE9kRo2GTrqUuVZWOPZnHJqLnJRWsvEdybsWqC5_m8Fz=s100-no',
+    indicator: 'critical',
+  },
+};
+```
+
+### EXERCISE 1
+Positive
+: Using the appropriate-ness rating from the previous exercise, have your service return a list of cards that use the intended icon, detail, and indicator.  DO NOT worry about creating the app link in this exercise!
+
+Negative
+: Again, remember that the CDS Developer Panel is your friend.  Also, remember that when you enter `Congenital heart disease` as a 'Reason' - the `pama-imaging` service will return a card.  You can quickly switch the selected service in the CDS Developer Panel to see what the Response payload looks like while developing your own service.
+
+### EXERCISE 2
+<dt>Positive</dt>
+<div>Add the following snippet to your generated cards.  This will provide a SMART link to launch your SMART app.
+```js
+links: [{
+  label: 'Edit Order in Demo App',
+  url: 'http://localhost:8899/launch.html',
+  type: 'smart'
+}],
+```
+</div>
+
+Negative
+: The links, as shown above, should be able to launch the app - but they still don't demonstrate how EHR data is passed to the external app.  There's a missing step that we'll get to in another section (soon, though).
+
+### Frequently Asked Questions
+
+#### TODO: populate these as they are asked
+Negative
+: Please ask questions as you think of them!
+
+## appContext
+Duration: 10
+
+### Problem
+Negative
+: Now that we've succeeded in using the EHR to steer clinicians to the demo app, we need to receive the contextual EHR data about the current pending order somehow.  Otherwise the app does not have a way to evaluate the pending order details.
+
+### Solution
+Positive
+: Any data that needs to be passed to the app can be serialized and set in the `card.link.appContext` field.
+
+### Reference
+
+- <https://cds-hooks.hl7.org/ballots/2018May/specification/1.0/#link>
+
+### EXERCISE 1
+Positive
+: Add an `appContext: {message: 'Hello, world!'}` field to your card links, just to test that it can be received on the client side.
+
+### EXERCISE 2
+Positive
+: In the `index.html` code, confirm that the `appContext.message` value is being received upon SMART launch.  One way to do this is by using the javascript console.  Alternatively, you can insert the message into the rendered HTML temporarily.  However you prefer - please confirm that the data passed through `appContext` is received on the other end!
 
 ### Frequently Asked Questions
 
@@ -805,8 +887,6 @@ Outline
 - TODO: link to the documentation.
 <https://github.com/smart-on-fhir/smart-web-messaging>
 
-- EXERCISE: Serialize the draft order, saving into the card.link.appContext
-- EXERCISE: Ask user to deserialize the draft order in the index.html client context
 - TODO: Provide the code to update the html using the client context
 - TODO: Link to the SMART Web Messaging docs
 - EXERCISE: Ask user to implement the closeApp function using window.postMessage

@@ -100,7 +100,9 @@
         <p>You are provided with a very simple, but working, guideline consultation app.  In PAMA parlance, this would be software from a Qualified CDS Mechanism, or a QCDSM.</p>
 <p>Below is an embedded version of the app in its original state.  The idea is that clinicians would use this tool alongside their EHR when consulting guidelines.  The app would provide them some kind of evidence code which they could copy and paste back into the EHR before signing an order.</p>
 <p>Feel free to explore the app to get a sense of how it works.  Any non-empty username and password will allow you to use the app - the login is totally fake.</p>
-<iframe class="embedded-iframe" src="https://glitch.com/embed/#!/embed/jewel-chevre?path=package.json&previewSize=100"></iframe>
+<h2 is-upgraded>Interactive Demo AUC App</h2>
+<aside class="special"><iframe class="embedded-iframe" src="https://glitch.com/embed/#!/embed/jewel-chevre?path=package.json&previewSize=100"></iframe>
+</aside>
 
 
       </google-codelab-step>
@@ -181,10 +183,15 @@ npm install
 <h3 is-upgraded>Login</h3>
 <p>You can use any non-empty username and password to log in to the app.</p>
 <p class="image-container"><img alt="login" src="img/5676161ebc2cd176.png"></p>
-<h2 is-upgraded>Exercises</h2>
-<p>To get you familiar with the app and how it works, please launch the app and use it to rate the following combinations of demographics.</p>
-<table>
+<h2 is-upgraded>EXERCISE</h2>
+<aside class="special"><p>To get you familiar with the app and how it works, please launch the app and use it to rate the following combinations of demographics.</p>
+<aside class="warning"><table>
 <tr></tr>
+<tr><td colspan="1" rowspan="1"><p>Age</p>
+</td><td colspan="1" rowspan="1"><p>Gender</p>
+</td><td colspan="1" rowspan="1"><p>Indication</p>
+</td><td colspan="1" rowspan="1"><p>Procedure</p>
+</td></tr>
 <tr><td colspan="1" rowspan="1"><p>4</p>
 </td><td colspan="1" rowspan="1"><p>male</p>
 </td><td colspan="1" rowspan="1"><p>lower back pain</p>
@@ -201,7 +208,9 @@ npm install
 </td><td colspan="1" rowspan="1"><p>ct scan without contrast materials</p>
 </td></tr>
 </table>
-<p>Be sure to <em>also</em> try any of the above tests, but with a missing field.  The app should require you to enter a value for each field (without doing any <em>additional</em> sanity checking, though).</p>
+</aside>
+<p>Be sure to <em>also</em> try any of the above tests, but with a missing field.  The app should require you to enter a value for each field (without doing any <em>additional</em> sanity checking, though).<br></p>
+</aside>
 <h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
 <h3 is-upgraded>I see this when trying to run the demo: <code>npm ERR! code ENOENT</code></h3>
 <aside class="warning"><p>Be sure you run <code>npm install</code> inside the <code>demo-auc-app</code> directory that you cloned from git.  After that completes, <em>then</em> run <code>npm run demo</code> and visit <a href="http://localhost:3001" target="_blank">http://localhost:3001</a>.</p>
@@ -228,7 +237,7 @@ npm install
 </aside>
 <h2 is-upgraded>SMART Launch Documentation</h2>
 <p>There is a very handy javascript library to enable easy configuration of SMART launches from the app.<br><a href="http://docs.smarthealthit.org/client-js/" target="_blank">http://docs.smarthealthit.org/client-js/</a></p>
-<h3 is-upgraded>EXERCISE 1</h3>
+<h2 is-upgraded>EXERCISE 1</h2>
 <aside class="special"><p>Consult the link above, and create a <code>launch.html</code> endpoint.</p>
 </aside>
 <aside class="warning"><p><em>Confused?</em>  Part of the goal of this codelab is to get you familiar with using the documentation, so there will be minimal hand-holding throughout.</p>
@@ -257,7 +266,7 @@ npm install
 </aside>
 <h3 is-upgraded>Scopes</h3>
 <p>More information about scopes can be found here.<br><a href="http://www.hl7.org/fhir/smart-app-launch/scopes-and-launch-context/index.html" target="_blank">http://www.hl7.org/fhir/smart-app-launch/scopes-and-launch-context/index.html</a></p>
-<h3 is-upgraded>EXERCISE 2</h3>
+<h2 is-upgraded>EXERCISE 2</h2>
 <aside class="special"><p>Make this <code>launch.html</code> page available on port <code>8899</code> on your local machine.</p>
 </aside>
 <p>Some hints:</p>
@@ -285,7 +294,7 @@ npm run launch
       <google-codelab-step label="Test SMART Launch" duration="5">
         <h2 is-upgraded>The SMART App Launcher</h2>
 <p>To test the new launch endpoint, we can use a free, open source tool called the SMART App Launcher.<br><a href="http://launch.smarthealthit.org/" target="_blank">http://launch.smarthealthit.org/</a></p>
-<h3 is-upgraded>EXERCISE</h3>
+<h2 is-upgraded>EXERCISE</h2>
 <aside class="special"><p>Visit the site and enter the path to your <code>launch.html</code> endpoint.  Click the green Launch App button to test.</p>
 </aside>
 <p>If it worked correctly, you should see the app launched within a mock EHR session and you should not have been prompted to enter a username and password.  You should have been prompted to pick a provider and also pick a patient.</p>
@@ -413,7 +422,7 @@ npm run launch
 <p>You may view the solution in <a href="https://github.com/microsoft-healthcare-madison/demo-auc-app/commit/dc28f441558ede38a7464483d2596f2f0e6b07ea#diff-eacf331f0ffc35d4b482f1d15a887d3b" target="_blank">this PR</a>.<br></p>
 </aside>
 <h2 is-upgraded>EXERCISE 2</h2>
-<aside class="warning"><p>Confirm that your changes work by SMART-launching the app from the SMART App Launch portal.  You will know you are complete when the form fields are automatically updated to match the patient you select in the patient picker.</p>
+<aside class="special"><p>Confirm that your changes work by SMART-launching the app from the SMART App Launch portal.  You will know you are complete when the form fields are automatically updated to match the patient you select in the patient picker.</p>
 </aside>
 <h2 is-upgraded>EXERCISE 3 (BONUS)</h2>
 <aside class="special"><p>Now that the app is capable of a SMART Launch, you can remove lots of the session / authentication logic in <code>index.js</code> to simplify things.</p>
@@ -511,7 +520,7 @@ app.get(&#39;/cds-services&#39;, function(request, response) {
 </ul>
 </aside>
 <h2 is-upgraded>EXERCISE 2</h2>
-<aside class="warning"><p><strong>Instructions</strong></p>
+<aside class="special"><p><strong>Instructions</strong></p>
 <ul>
 <li>Delete the selected order and reason, if any are selected.</li>
 <li>Type <code>congenital heart</code> into the ‘Search reasons&#39; box and select the top suggestion.</li>
@@ -524,7 +533,7 @@ app.get(&#39;/cds-services&#39;, function(request, response) {
 <aside class="special"><p>See if you can discover the complete list of CDS Services at <a href="https://fhir-org-cds-services.appspot.com" target="_blank">https://fhir-org-cds-services.appspot.com</a> by modifying the URL (or adding something to it).</p>
 </aside>
 <h2 is-upgraded>EXERCISE 4</h2>
-<aside class="warning"><p><strong>Instructions</strong></p>
+<aside class="special"><p><strong>Instructions</strong></p>
 <ul>
 <li>Configure the CDS Hooks Sandbox to use your local CDS Hooks service by providing it with your discovery endpoint (which should be somewhere on <code>http://localhost</code>).</li>
 <li>Change the selected service in the CDS Developer Panel to your new service, which should apear as <code>demo-auc-app</code>.</li>
@@ -618,15 +627,17 @@ module.exports = {
   CPT, SNOMED, criteria, evaluate, getRating: Criterion.prototype.getRating,
 };
 </code></pre>
-<h2 is-upgraded>EXERCISE</h2>
-<aside class="warning"><p><em>Instructions</em></p>
+<h2 is-upgraded>EXERCISE 1</h2>
+<aside class="special"><p><strong>Instructions</strong></p>
 <ul>
 <li>Create the file <code>auc.js</code> using the content above.</li>
-<li>Import the module in your CDS Hooks service.</li>
+<li>Import the module in your CDS Hooks service (a la <code>const auc = require(&#39;./auc.js&#39;);</code>).</li>
 <li>Use the imported functionality to determine which appropriate-ness score the current selection has using the currently-selected orders and diagnoses.</li>
 </ul>
 </aside>
-<h2 is-upgraded>EXERCISE (OPTIONAL)</h2>
+<aside class="warning"><p>You may struggle here a bit learning how to extract the currently selected order and diagnosis from the current Request message.  Remember that the CDS Developer Panel in the sandbox UI is your friend.</p>
+</aside>
+<h2 is-upgraded>EXERCISE 2 (OPTIONAL)</h2>
 <aside class="special"><p>Refactor the old service to remove the AUC logic from it, replacing it with a module import of the new <code>auc.js</code> code.</p>
 </aside>
 
@@ -635,7 +646,7 @@ module.exports = {
     
       <google-codelab-step label="Playing with Cards" duration="20">
         <h2 is-upgraded>Problem</h2>
-<aside class="warning"><p>We want the EHR interface to display a card based on selection.  Also, when the current selection is outside of guideline recommendations, that displayed card should be eye-catching.  When the selection is within guidelines, it should be recognizable as ‘good&#39;.</p>
+<aside class="warning"><p>We want the EHR interface to display a card based on selection.  Also, when the current selection is outside of guideline recommendations, the displayed card should be eye-catching.  When the selection is <em>within</em> guidelines, it should be recognizable as ‘good&#39;.</p>
 </aside>
 <h2 is-upgraded>Solution</h2>
 <aside class="special"><p>We&#39;ll implement the cards to change their displayed icon and border color using varying levels of card type.</p>
@@ -650,8 +661,67 @@ module.exports = {
 <li><a href="https://cds-hooks.org/specification/current/#cds-service-response" target="_blank">https://cds-hooks.org/specification/current/#cds-service-response</a></li>
 <li><a href="https://cds-hooks.org/specification/current/#card-attributes" target="_blank">https://cds-hooks.org/specification/current/#card-attributes</a></li>
 </ul>
-<h3 is-upgraded>CDS Hooks Cards</h3>
-<p>A card can be displayed to the user in several different ways.</p>
+<h2 is-upgraded>A Head Start</h2>
+<p>The following code snippet will help you get started matching the look of the intended output.</p>
+<pre><code>const cardDetails = {
+  &#39;appropriate&#39;: {
+    detail: &#39;This order meets AUC guidelines.&#39;,
+    icon: &#39;https://lh3.googleusercontent.com/bYNztCIytfV24Hzu9O11XcMhcHdcjRbX0TX2JfxX_LN-tKOOvqQi1lAhmBv7hY8UbMBmshW9vq3jFMO5kbCbq4fTsSWmlccsknxRvtGNunP_IktjIAn38prInj-6f6qWcTk3A9C3kkkJIilgeWOeOy3j8rifvViasCyhm5AGxeBs0TwyLIS-rV7LJDEWI9PjhTPcalYmvZBpl5Yti073BFHlBdMQH98D4CLQle9ZOR8zvXs43NGQdDFRk6QYplv7WFy6veT8b_sGeGxssvPVQoL9Kzcdagd1ftrvsY9vEzm9U79x4u9sBH_kw-BjyJilBh3ZLcTISbuSN-zT3Xn77uOh-aIemSKnr7jl33Ex3i0JyqxMcmj1Wc7cH4sCEHJ7bku3yZYndzVZgjvyPOV44EWo5OyDNVdQ22Hv4LbbSGQku0NCiSbm8g17rb3agKRnjmgioe6kWpa4lH16Q80FuRmAyYZ0GbBJl407qRrmMN-oO9R_LnzIABoV8BPyfU4BvsTDO_GZMBlaoy2K1Qv-0RL9faAjpN6iNQdofpJ28qn07MjJM-vHqPyD3U-eA8RgpSsofQscgE57GrSDDLRhgev3iyhhu2XU4pHbvmd4UUf82a2W0_OYkOlkeiTXM_YdrrW7E2Zpp2pWoIhZJIgXAVuaIz4v6k6EREPeBUuYiAoJHNs-UNXg3cvz=s100-no&#39;,
+    indicator: &#39;success&#39;,
+  },
+  &#39;no-guidelines-apply&#39;: {
+    detail: &#39;This order is not specified by AUC guidelines.&#39;,
+    icon: &#39;https://lh3.googleusercontent.com/fLQElMed2CFqAHxwRlIe5gJoHp9PFyZUPEcjgdB2Jj2dL7tHKfg4potyo39gsQeP_6wQ7zkWXaMGR7KnfkDrW1ks0jYaHmMdFi-AUer53CQCkKBwkgIEtgRSlozLDqiqpTBMIGRfsj_6oYtruy8O1cFEI54xSjXGtC3l3HThdk93lOjwbxdmqshbkYvm1XYTNcJuBQBdYgIEJusjX_RDBTvJiAxQ0lBeYSHjGBE8JibvQjLboSqNwefLVbIZ24LUenGoub9Y8mhVlxUeQMQPYclnn5W5Nj509L0Oc65ZAvLhoqAJs_sI6gr7ViJqkgdGfRe2pAXbikX2vBvLRHMktcGD5J_YVYTst5vrvfnhfhE0P-kPSp4XLt4WrfP5OQe7lysg-EFyiK6F7REP7NmiPy8x8hf9O9GuUoPFqXwU4psdoXbuNpCsuPA6tfnU6QwC-vUvzOWJgF1bMpu8NimhqPrOgBAUAHh0eVh9p3_ix8OwKBZ70EX8a7E9mq67k0-rTtMoElwBkFNzArTsMd1xp6QboF0F-oV_Li7xje_7Fokn-nDbB72ULX9K-MVbSkZvhD7Y_hJwQPG6wWF4kHaX_zzZsdD5botGT2VMrF-wGklzRrh2bBS-jT12IAeBECGgO_XKOu3Ire3WQ0SUdYGpE5Ebs4KrWAOykznsL9OqfkVuD1SIwjKgR-A2=s100-no&#39;,
+    indicator: &#39;warning&#39;
+  },
+  &#39;not-appropriate&#39;: {
+    detail: &#39;This order does not meet AUC guidelines.&#39;,
+    icon: &#39;https://lh3.googleusercontent.com/6f3-twVm-TIZr0IWsb4Yuiys58PkeV3RU89XSDjRtV2beBiKxsoSg4-7qNgzLkZZf-Vy-1OoG5pswPQSK8XRuW3lE56wQgkItirK-iBozZMoD5JvcOR6ZxusPjrvMOE-iwaOKYZxnk0qyoDu7W4WQfaTDaGXAL26OuV_VBIxL0SSXzONWCrk70ckTJPzGy7detQTWknOZJNLuLEv0N45q_EoOu6SLgUlf3woVe-zm0JMNV68JsXH5FIlRwidaplY19MnY40If0fGtQkvnrNS4lwZ9pnx_PK_wiTJhhnpfuNRvrhy_Bdphsy_CN0fMj2FfrwhOJl48jlg8IvIkMzDMlEZGthzryIhN2B-94Eq2oNZS9JaAixqLg2P06_HcaVWMi5x6slPMCal_sU78yuta5lNZdxS7XYw9xJWLjW8Mu_LPKoA6m0onGcYLnwYkdXLFvqdF4dWKYOx1uFvPAMOsucST4orXqVTFWFiEm39et-ZUVOArLm9yXh8i4zl5PKTs4sA7c4u8CLwLyW04Unkg59KnL0ZNKX0xRNm052pW_WhX2g48oKjPIqnQ6Zl1omgNgzIyHo2mvpIKstENpGJwsIqNO456kWEbgUmydTZn40d-VdG47d5Xg5R0jl-WGrK_FbG8u0DupeeCE9kRo2GTrqUuVZWOPZnHJqLnJRWsvEdybsWqC5_m8Fz=s100-no&#39;,
+    indicator: &#39;critical&#39;,
+  },
+};
+</code></pre>
+<h2 is-upgraded>EXERCISE 1</h2>
+<aside class="special"><p>Using the appropriate-ness rating from the previous exercise, have your service return a list of cards that use the intended icon, detail, and indicator.  DO NOT worry about creating the app link in this exercise!</p>
+</aside>
+<aside class="warning"><p>Again, remember that the CDS Developer Panel is your friend.  Also, remember that when you enter <code>Congenital heart disease</code> as a ‘Reason&#39; - the <code>pama-imaging</code> service will return a card.  You can quickly switch the selected service in the CDS Developer Panel to see what the Response payload looks like while developing your own service.</p>
+</aside>
+<h2 is-upgraded>EXERCISE 2</h2>
+<aside class="special"><p>Add the following snippet to your generated cards.  This will provide a SMART link to launch your SMART app.</p>
+<pre><code>links: [{
+  label: &#39;Edit Order in Demo App&#39;,
+  url: &#39;http://localhost:8899/launch.html&#39;,
+  type: &#39;smart&#39;
+}],
+</code></pre>
+</aside>
+<aside class="warning"><p>The links, as shown above, should be able to launch the app - but they still don&#39;t demonstrate how EHR data is passed to the external app.  There&#39;s a missing step that we&#39;ll get to in another section (soon, though).</p>
+</aside>
+<h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
+<h3 is-upgraded>TODO: populate these as they are asked</h3>
+<aside class="warning"><p>Please ask questions as you think of them!</p>
+</aside>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="appContext" duration="10">
+        <h2 is-upgraded>Problem</h2>
+<aside class="warning"><p>Now that we&#39;ve succeeded in using the EHR to steer clinicians to the demo app, we need to receive the contextual EHR data about the current pending order somehow.  Otherwise the app does not have a way to evaluate the pending order details.</p>
+</aside>
+<h2 is-upgraded>Solution</h2>
+<aside class="special"><p>Any data that needs to be passed to the app can be serialized and set in the <code>card.link.appContext</code> field.</p>
+</aside>
+<h2 is-upgraded>Reference</h2>
+<ul>
+<li><a href="https://cds-hooks.hl7.org/ballots/2018May/specification/1.0/#link" target="_blank">https://cds-hooks.hl7.org/ballots/2018May/specification/1.0/#link</a></li>
+</ul>
+<h2 is-upgraded>EXERCISE 1</h2>
+<aside class="special"><p>Add an <code>appContext: {message: &#39;Hello, world!&#39;}</code> field to your card links, just to test that it can be received on the client side.</p>
+</aside>
+<h2 is-upgraded>EXERCISE 2</h2>
+<aside class="special"><p>In the <code>index.html</code> code, confirm that the <code>appContext.message</code> value is being received upon SMART launch.  One way to do this is by using the javascript console.  Alternatively, you can insert the message into the rendered HTML temporarily.  However you prefer - please confirm that the data passed through <code>appContext</code> is received on the other end!</p>
+</aside>
 <h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
 <h3 is-upgraded>TODO: populate these as they are asked</h3>
 <aside class="warning"><p>Please ask questions as you think of them!</p>
@@ -665,8 +735,6 @@ module.exports = {
 <ul>
 <li>TODO: introduce the design goals (show pictures of the wanted UI).</li>
 <li>TODO: link to the documentation.<br><a href="https://github.com/smart-on-fhir/smart-web-messaging" target="_blank">https://github.com/smart-on-fhir/smart-web-messaging</a></li>
-<li>EXERCISE: Serialize the draft order, saving into the card.link.appContext</li>
-<li>EXERCISE: Ask user to deserialize the draft order in the index.html client context</li>
 <li>TODO: Provide the code to update the html using the client context</li>
 <li>TODO: Link to the SMART Web Messaging docs</li>
 <li>EXERCISE: Ask user to implement the closeApp function using window.postMessage</li>
