@@ -3,7 +3,7 @@ https://microsoft-healthcare-madison.github.io/demo-auc-app
 
 <img src="./images/codelab_screenshot.png" width="512">
 
-This codelab is designed to walk you through a tutorial of CDS Hooks, SMART Web Messaging, and satisfying the requirements of the PAMA Imaging requirements, that all diagnostic medical imaging orders include evidence of AUC guideline consultation.
+This codelab is designed to walk you through a tutorial of implementing CDS Hooks, using the SMART Launch framework, bi-directional SMART Web Messaging, and to explore some of the motivations behind (and the practical implications of) mandatory AUC guideline consultation rules for 2020 and beyond.
 
 # smart-auc-demo
 A demonstration SMART app that serves AUC external guidance for PAMA.
