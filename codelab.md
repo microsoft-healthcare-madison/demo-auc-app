@@ -276,7 +276,7 @@ Duration: 30
 ### Solution
 <dt>positive</dt>
 <div>The SMART Launch Framework can dramatically improve the situation!<br>
-With the [SMART App Launch Framework](https://www.hl7.org/fhir/smart-app-launch/), the app will be able to securely read data from the EHR using the credentials of the clinician (through OAuth2 openid connect).  The provider will not need to remember a separate username and password to use the app anymore, and the app will be able to pre-load form fields using the available context in the EHR.<br>
+With the [SMART App Launch Framework](https://www.hl7.org/fhir/smart-app-launch/), the app will be able to securely read data from the EHR through access delegation (OAuth 2) and single-sign-on (OpenID Connect).  The provider will not need to remember a separate username and password to use the app anymore, and the app will be able to pre-load form fields using the available context in the EHR.<br>
 This will reduce user errors, save the user time, and spare them some frustrations.
 </div>
 
@@ -367,7 +367,7 @@ To test the new launch endpoint, we can use a free, open source tool called the 
 ### EXERCISE
 
 Positive
-: Visit the site and enter the path to your `launch.html` endpoint.  Click the green Launch App button to test.
+: Visit the SMART App Launcher and enter the path to your `launch.html` endpoint.  Click the green Launch App button to test.
 
 If it worked correctly, you should see the app launched within a mock EHR session and you should not have been prompted to enter a username and password.  You should have been prompted to pick a provider and also pick a patient.
 
@@ -378,7 +378,7 @@ If it worked correctly, you should see the app launched within a mock EHR sessio
 ![launched](images/smart_launched_app.png)
 
 #### Notice
-If you had configured your launch URL to have a pre-selected patient, you would not have seen the patient picker and the patient name listed at the top and bottom edges of the Simulated EHR would have been filled in automatically using that patient; however, the age and gender would not automatically be populated in the form fields.  We must first modify the HTML to do that, which will happen in the next section.
+If you had configured your launch URL to have a pre-selected patient, you would not have seen the patient picker; instead, the patient name listed at the top and bottom edges of the Simulated EHR would have been filled in automatically using that patient. However, the age and gender would not automatically be populated in the form fields.  We must first modify the HTML to do that, which will happen in the next section.
 
 ### Frequently Asked Questions
 
@@ -400,7 +400,7 @@ Negative
 #### I was not prompted to select either a patient or a provider.
 
 Negative
-: Be sure your launch URL includes the full `launch.html` portion, and not just a path to the webserver root.  Also confirm that you're running the `v1.0` branch of the code (not `master` or `v2.0`).
+: Be sure your launch URL includes the full `launch.html` portion, and not just a path to the webserver root.  Also confirm that you're running the `v1.0` tag of the code (not `master` or `v2.0`).
 
 ## Using the SMART Launch Client
 Duration: 20
@@ -536,8 +536,7 @@ Duration: 90
 
 ### Problem
 <dt>negative</dt>
-<div>While it's true that we have improved the situation greatly by giving the app the ability to SMART Launch, we still have not addressed the concern that the provider needs to leave the EHR in order to use the app (after remembering how to find it).<br>
-We also would like to provide a helpful signal to the user whenever it is appropriate to use the app, reducing the chance that the user will forget to consult the app before ordering advanced diagnostic medical imaging.
+<div>While we have improved the situation greatly by giving the app the ability to SMART Launch, we still have not addressed the concern that the provider needs to specifically remember when to use this app. Without contextual reminders, a guidelines app us unlikely to see widespread adoption within the ordering workflow for advanced diagnostic medical imaging.
 </div>
 
 ### Solution
@@ -554,7 +553,7 @@ You can find lots of helpful information on CDS Hooks here:
 - Swagger API Definition: <http://editor.swagger.io/?url=https://raw.githubusercontent.com/cds-hooks/api/master/cds-hooks.yaml>
 
 ### CDS Hooks Overview
-Taken from: <http://cds-hooks.org/>
+Taken from: <https://cds-hooks.org/>
 ![cds-hooks](images/cds_hooks_overview.png)
 
 If you follow the overall flow of CDS Hooks in the diagram above, you can see how the EHR and the CDS Hooks service work together.  But how does the EHR *know* about the CDS Hooks service?
@@ -628,7 +627,7 @@ To test and develop your CDS Hooks service, it's recommended to use one of the s
 <div>**Instructions**
 
 - Select the PAMA Imaging tab, if not already selected.
-- Enter the number `72133` in the 'Search orders' box.  This is a CPT procedure code.
+- Enter the number `72133` in the 'Search orders' box.  This is a CPT procedure code for lumbar spine CT.
 - Select the auto-suggested 'CT, lumbar spine' order, which should be the only suggestion.
 - Enter `low back pain` in the 'Search reasons' box and select the top result.
 - In the CDS Developer Panel on the right, select the `pama-imaging` service if not already selected.
