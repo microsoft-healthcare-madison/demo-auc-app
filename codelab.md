@@ -61,27 +61,27 @@ You will start with an already-implemented form-entry app that evaluates the app
 - v2: Create a CDS Hooks service to evaluate a *draft* order in an EHR, and show a link to the SMART app.
 - v3: Enable the SMART app to update the draft order inside the EHR.
 
+<dt>negative</dt>
+<div>
+#### Note for Students
+If you already have a good grasp of PAMA, the SMART launch process, and CDS Hooks, you can **skip** ahead and begin the process *after* the CDS Hooks implementation by checking out the code at `v2.0` in the repo and advancing to the section called **SMART Web Messaging** in this codelab.
+
+There's another git tag, `v3.0`, for the **final** solution.  Check out this version of the code if you just want to play with a working copy of the app.  However, if you're here to learn, it is recommended that you find time to do the full codelab.
+</div>
+</div>
+
 ## PAMA
 Duration: 20
 
 ### PAMA - Protecting Access to Medicare Act of 2014
 
-<dt>Negative</dt>
+<dt>Positive</dt>
 <dd>
 ***"If we in the United States could lower the prices and per-capita volumes of our CT scans, MRIs, and just the top 25 high-volume-high-price surgical procedures to those of the Netherlands, for example, we would see savings of about $425 per capita, or a total of $137 billion."***
 <p>
 <p>
 **[Ezekiel Emanuel](https://en.wikipedia.org/wiki/Ezekiel_Emanuel), on an [article published in JAMA, March 2018](https://jamanetwork.com/journals/jama/article-abstract/2674671)**
 </dd>
-
-#### Skip Ahead
-This section has *lots* of background which explains *why* the [PAMA](https://www.cms.gov/Medicare/Medicare-Fee-for-Service-Payment/ClinicalLabFeeSched/PAMA-Regulations) imaging use case was chosen for this exercise.  If you aren't interested in PAMA, and are here purely to learn the technology, you can skip ahead to the next section.  However, it might help to take at least *a few* minutes to skim this material, just to get the gist of what problem is being solved.
-
-#### **Warp** Ahead
-
-If you already have a good grasp of the SMART launch process, and you would like to do a lot more than *skip* ahead, you can **warp** ahead and begin the process at CDS Hooks implementation by checking out the code at `v2.0` in the repo and advancing to the section called **Write a CDS Hooks Service** in this codelab.
-
-There's another git tag, `v3.0`, for the **final** solution.  Check out this version of the code if you just want to play with a working copy of the app.  However, if you're here to learn, it is recommended that you find time to do the full codelab.
 
 ### PAMA Imaging
 New PAMA imaging requirements are taking effect, starting on January 1st, 2020.  The American College of Radiology has put out some very helpful media to explain why this is important.
@@ -163,7 +163,7 @@ By clicking on the 'Update EHR' button, the pending order will be modified to us
 #### Which EHRs currently support the technologies required to enable these services?
 
 <dt>positive</dt>
-<pre>Currently, very *few* EHR vendors have implemented the required CDS Hooks or SMART Web Messaging to enable this (*T-Systems is a notable exception*).  Cerner has committed to doing this, though, and it's not a matter of if, but of when.  Epic is also 'working on it.'<br>
+<pre>Currently, very *few* EHR vendors have implemented the required CDS Hooks or SMART Web Messaging to enable this (*[T-System](https://www.tsystem.com/) is one notable exception*).  Cerner has committed to doing this, though, and it's not a matter of if, but of when.  Epic is also 'working on it.'<br>
 While this may seem like a negative thing, the other way to see the situation is that any QCDSM vendor who is *ready* with product when CDS Hooks *does* become widespread will have the mover's advantage.  Also, there is currently relatively low pressure for an EHR vendor to get 'caught up' with competitors (but that should be changing rapidly in 2020).<br>
 In other words, there is still time for *everyone* to get ready!<br>
 For a list of vendors who support CDS Hooks, please refer to this:
