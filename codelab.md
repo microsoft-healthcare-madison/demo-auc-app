@@ -1032,6 +1032,7 @@ In order to send messages to the EHR, the client code must do the following:
   - Use `window.opener.postMessage` when the client is launched into a separate browser.
 - Generate a unique UUID per message.
 - Provide the SMART Web Messaging Handle received from the server upon launch.
+- Specify the `targetOrigin` of the destination EHR.
 
 ### `targetWindow`
 You can use the ternary operator to deduce the `targetWindow`.
@@ -1056,9 +1057,90 @@ uuidv4(); // -> v4 UUID
 ### SMART Web Messaging Handle
 TODO(carl): update the `master` branch to have a correct implementation and reference it here.
 
+### `targetOrigin`
+TODO(carl): update the `master` branch to have a correct implementation and reference it here.
+
 ### EXERCISE 1
+<dt>positive</dt>
+<div>Add the aforementioned code pieces to your `index.html` page so you are able to invoke `targetWindow.postMessage` within the `closeApp` function.  Add any missing parameters so that the invocation is capable of closing the app.
+
+Negative
+: If you need to confirm *what* messages were received by the CDS Hooks Sandbox, be aware that in the CDS Developer Panel, there is a section called `Messages` (below `Request` and `Response`) which displays all received messages.
+</div>
+
+### Frequently Asked Questions
+
+#### TODO: populate these as they are asked
+Negative
+: Please ask questions as you think of them!
+
+## Using the AUC Module
+Duration: 30
+
+### Problem
+<dt>Negative</dt>
+<div>The earlier version of the app simply POST'ed the form selections to a remote service for evaluation, displaying the appropriateness result to the page.  This makes it awkward for users to use the tool interactively, because it involves them clicking a button and then clicking 'back' for each iteration.
+</div>
+
+### Solution
+<dt>positive</dt>
+<div>
+Since we have the AUC logic available in a module, we can include it in the page and tie the form to a javascript function, rather than relying on a remote service.  The 'submit' button will be renamed 'evaluate' and clicking it will no longer navigate away from the page.  Instead, a document element will display the 'current' appropriateness rating and update that element whenever the 'evaluate' button is clicked.
+
+Negative
+: There are *many* other ways to solve this problem, and this particular approach was chosen because it's easy to implement and demo.  A QCDSM might wish to retain their AUC logic behind an API call or a remote service, and rely instead on fetching remote results asynchronously.
+</div>
+
+### Design Goals
+Recall that in the Exercise Overview section, the end-result screenshot of the app had renamed the 'Submit' button to be 'Evaluate'.  Also, the appropriateness rating of the current selection was to be displayed on the app below the form fields.
+
+![evaluate](./images/evaluate_button.png)
+
+### Changes to `index.html`
+Add the following changes to the existing app to enable using the AUC module within `index.html` and without requiring an external service to be available to answer requests.
+
+```js
+<form id='auc_form' onsubmit="return evaluateFormContent()">
+...
+  <input type="submit" value="Evaluate" />
+</form>
+...
+<div>Current rating is:</div><div id='rating'>Waiting for data...</div>
+...
+<script>let module = {};  // HACK to allow in-browser import of auc.js</script>
+<script src="auc.js"></script>
+...
+<script>
+...
+function showRating() {
+  document.getElementById('rating').innerText = getRating();
+}
+function evaluateFormContent() {
+  showRating();
+  return false;  // <- prevent page refresh upon click.
+}
+function getRating() {
+  const order = document.getElementById('procedures').value;
+  const reasons = document.getElementById('indications').value;
+  return evaluate(order, [reasons]);  // <- Use the AUC.evaluate function.
+}
+...
+FHIR.oauth2.ready()
+  .then(getContext)
+  .then(populateForm)
+  .then(showRating)  // <- NEW: DISPLAY THE RATING OF THE FORM ON LOAD
+  .then(showButtons)
+  .catch(console.error);
+```
+
+### EXERCISE 1
+<dt>Positive</dt>
+<div>Add the code above and confirm that clicking on the `Evaluate` button does **not** navigate away from the current page.  Find a combination of Reasons and Orders that produces a result of each type (`appropriate`, `no-guidelines-apply`, and `not-appropriate`).
+</div>
+
+### EXERCISE 2 (BONUS)
 Positive
-: Add the aforementioned code pieces to your `index.html` page so you are able to invoke `targetWindow.postMessage` within the `closeApp` function.  Add any missing parameters so that the invocation is capable of closing the app.
+: Turn down the external AUC service entirely, leaving only the launch endpoint and the CDS Hooks services running.  Remove the unused code and references from `index.js` and `package.json`.
 
 ### Frequently Asked Questions
 
@@ -1069,11 +1151,99 @@ Negative
 ## Updating the EHR
 Duration: 20
 
-Outline
+#### Congratulations on making it to the final section!
+Don't stop now!  This is (probably) the most important piece of the puzzle, and once it's in place it really makes the whole user experience very seamless.
 
-- TODO: provide the code to apply auc logic to the form (the Evaluate button)
-- EXERCISE: Ask user to implement the updateApp function
-- TEST: confirm that updates in the launched app update the CDS Hooks sandbox
+### EXERCISE 1
+<dt>Positive</dt>
+<div>Modify the CDS Hooks service to include the 'draft order' in the `appContext` link.  The idea is that to update the draft order, the app will make changes to it and send it back as the payload of a `postMessage`.</div>
+
+### EXERCISE 2
+<dt>Positive</dt>
+<div>Use the following implementation of `updateApp` to simply send the unchanged draft order back to the EHR, confirming in the `Messages` panel that the order payload was received.
+
+```js
+function updateApp() {
+  targetWindow.postMessage({
+    payload: appContext.draftOrder,
+    messagingHandle,
+    messageId: uuidv4(),
+    messageType: 'TODO: consult the docs to determine what this should be',
+  }, targetOrigin);
+  closeApp();
+}
+```
+</div>
+
+### EXERCISE 3
+<dt>positive</dt>
+<div>Insert the following code to help you apply the form values to a `pama-rating` extension object.  Once this attribute has been added to the draft order, the EHR will use it to update the pending order, annotating it with evidence that the guideline app has been consulted prior to the order being signed!
+
+```js
+QCDSMID = 'G1011';
+...
+function addRating(draftOrder, rating) {
+  draftOrder.resource.extension = [
+    'TODO: use the docs to build a pama-rating CodeableConcept'
+  ];
+}
+function applyFormData(draftOrder) {
+  const orderId = document.getElementById('procedures');
+  const orderText = document.getElementById(orderId.value).innerText;
+  const indicationId = document.getElementById('indications');
+  const indicationText = document.getElementById(indicationId.value).innerText;
+  draftOrder.resource.code.coding[0].code = orderId.value;
+  draftOrder.resource.code.coding[0].display = orderText;
+  draftOrder.resource.reasonCode[0].coding[0].code = indicationId.value;
+  draftOrder.resource.reasonCode[0].coding[0].display = indicationText;
+}
+function updateApp() {
+  const draftOrder = appContext.draftOrder;
+  const rating = getRating();
+  applyFormData(draftOrder);
+  addRating(draftOrder, rating);
+  targetWindow.postMessage({
+    payload: draftOrder,
+    messagingHandle,
+    messageId: uuidv4(),
+    messageType: 'TODO: consult the docs to determine what this should be',
+  }, targetOrigin);
+  closeApp();  // TODO: consider commenting this line out while developing...
+}
+```
+</div>
+
+### EXERCISE 4
+Positive
+: Confirm that the EHR is being updated when you click the 'Update EHR' button.  You should see the selected values in the CDS Hooks sandbox Orders and Reasons panels.  You should also see evidence of received messages in the `Messages` section of the CDS Developer Panel.
+
+### EXERCISE 5
+<dt>Positive</dt>
+<div>**Instructions**
+
+- In the CDS Hooks sandbox, select an Order and Reason combination that is rated as 'not-appropriate'.
+- Click the SMART launch card link, launching the SMART app
+- Select a combination that is 'appropriate'.
+- Confirm that the app rates it as appropriate by clicking the `Evaluate` button.
+- Click the `Update EHR` button to update the EHR and close the app.
+- Confirm that the EHR shows the same Order and Reasons that you selected in the app.
+- Confirm that the EHR displays an 'appropriate' rating in the CDS Hooks card.
+- Confirm that when clicking the SMART launch card link, the displayed form still shows the expected selections.
+
+</div>
+
+### EXERCISE 6
+Positive
+: Go celebrate!  You have worked hard to get here and you deserve something fun.
+
+### EXERCISE 7 (BONUS)
+<dt>Positive</dt>
+<div>Submit feedback on this codelab to the authors!  This 'codelab' is an experimental format of teaching the technology and the authors are looking for input from the community.<br>
+Sign the guestbook when you have completed the codelab.
+<https://github.com/microsoft-healthcare-madison/demo-auc-app/wiki/Guestbook><br>
+If you have found any bugs or overly-confusing sections during the process, please click the [Report a mistake](https://github.com/microsoft-healthcare-madison/demo-auc-app/issues) link in the lower left and create an `issue` so we can track the problem and correct it.<br>
+THANK YOU!
+</div>
 
 ### Frequently Asked Questions
 

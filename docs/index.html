@@ -854,6 +854,7 @@ function updateApp() {
 </li>
 <li>Generate a unique UUID per message.</li>
 <li>Provide the SMART Web Messaging Handle received from the server upon launch.</li>
+<li>Specify the <code>targetOrigin</code> of the destination EHR.</li>
 </ul>
 <h2 is-upgraded><code>targetWindow</code></h2>
 <p>You can use the ternary operator to deduce the <code>targetWindow</code>.</p>
@@ -869,8 +870,72 @@ uuidv4(); // -&gt; v4 UUID
 </code></pre>
 <h2 is-upgraded>SMART Web Messaging Handle</h2>
 <p>TODO(carl): update the <code>master</code> branch to have a correct implementation and reference it here.</p>
+<h2 is-upgraded><code>targetOrigin</code></h2>
+<p>TODO(carl): update the <code>master</code> branch to have a correct implementation and reference it here.</p>
 <h2 is-upgraded>EXERCISE 1</h2>
 <aside class="special"><p>Add the aforementioned code pieces to your <code>index.html</code> page so you are able to invoke <code>targetWindow.postMessage</code> within the <code>closeApp</code> function.  Add any missing parameters so that the invocation is capable of closing the app.</p>
+<aside class="warning"><p>If you need to confirm <em>what</em> messages were received by the CDS Hooks Sandbox, be aware that in the CDS Developer Panel, there is a section called <code>Messages</code> (below <code>Request</code> and <code>Response</code>) which displays all received messages.<br></p>
+</aside>
+</aside>
+<h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
+<h3 is-upgraded>TODO: populate these as they are asked</h3>
+<aside class="warning"><p>Please ask questions as you think of them!</p>
+</aside>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Using the AUC Module" duration="30">
+        <h2 is-upgraded>Problem</h2>
+<aside class="warning"><p>The earlier version of the app simply POST&#39;ed the form selections to a remote service for evaluation, displaying the appropriateness result to the page.  This makes it awkward for users to use the tool interactively, because it involves them clicking a button and then clicking ‘back&#39; for each iteration.<br></p>
+</aside>
+<h2 is-upgraded>Solution</h2>
+<aside class="special"><p><br>Since we have the AUC logic available in a module, we can include it in the page and tie the form to a javascript function, rather than relying on a remote service.  The ‘submit&#39; button will be renamed ‘evaluate&#39; and clicking it will no longer navigate away from the page.  Instead, a document element will display the ‘current&#39; appropriateness rating and update that element whenever the ‘evaluate&#39; button is clicked.</p>
+<aside class="warning"><p>There are <em>many</em> other ways to solve this problem, and this particular approach was chosen because it&#39;s easy to implement and demo.  A QCDSM might wish to retain their AUC logic behind an API call or a remote service, and rely instead on fetching remote results asynchronously.<br></p>
+</aside>
+</aside>
+<h2 is-upgraded>Design Goals</h2>
+<p>Recall that in the Exercise Overview section, the end-result screenshot of the app had renamed the ‘Submit&#39; button to be ‘Evaluate&#39;.  Also, the appropriateness rating of the current selection was to be displayed on the app below the form fields.</p>
+<p class="image-container"><img alt="evaluate" src="img/5bf384ef8442a764.png"></p>
+<h2 is-upgraded>Changes to <code>index.html</code></h2>
+<p>Add the following changes to the existing app to enable using the AUC module within <code>index.html</code> and without requiring an external service to be available to answer requests.</p>
+<pre><code>&lt;form id=&#39;auc_form&#39; onsubmit=&#34;return evaluateFormContent()&#34;&gt;
+...
+  &lt;input type=&#34;submit&#34; value=&#34;Evaluate&#34; /&gt;
+&lt;/form&gt;
+...
+&lt;div&gt;Current rating is:&lt;/div&gt;&lt;div id=&#39;rating&#39;&gt;Waiting for data...&lt;/div&gt;
+...
+&lt;script&gt;let module = {};  // HACK to allow in-browser import of auc.js&lt;/script&gt;
+&lt;script src=&#34;auc.js&#34;&gt;&lt;/script&gt;
+...
+&lt;script&gt;
+...
+function showRating() {
+  document.getElementById(&#39;rating&#39;).innerText = getRating();
+}
+function evaluateFormContent() {
+  showRating();
+  return false;  // &lt;- prevent page refresh upon click.
+}
+function getRating() {
+  const order = document.getElementById(&#39;procedures&#39;).value;
+  const reasons = document.getElementById(&#39;indications&#39;).value;
+  return evaluate(order, [reasons]);  // &lt;- Use the AUC.evaluate function.
+}
+...
+FHIR.oauth2.ready()
+  .then(getContext)
+  .then(populateForm)
+  .then(showRating)  // &lt;- NEW: DISPLAY THE RATING OF THE FORM ON LOAD
+  .then(showButtons)
+  .catch(console.error);
+</code></pre>
+<h2 is-upgraded>EXERCISE 1</h2>
+<aside class="special"><p>Add the code above and confirm that clicking on the <code>Evaluate</code> button does <strong>not</strong> navigate away from the current page.  Find a combination of Reasons and Orders that produces a result of each type (<code>appropriate</code>, <code>no-guidelines-apply</code>, and <code>not-appropriate</code>).<br></p>
+</aside>
+<h2 is-upgraded>EXERCISE 2 (BONUS)</h2>
+<aside class="special"><p>Turn down the external AUC service entirely, leaving only the launch endpoint and the CDS Hooks services running.  Remove the unused code and references from <code>index.js</code> and <code>package.json</code>.</p>
 </aside>
 <h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
 <h3 is-upgraded>TODO: populate these as they are asked</h3>
@@ -881,12 +946,80 @@ uuidv4(); // -&gt; v4 UUID
       </google-codelab-step>
     
       <google-codelab-step label="Updating the EHR" duration="20">
-        <p>Outline</p>
+        <h3 is-upgraded>Congratulations on making it to the final section!</h3>
+<p>Don&#39;t stop now!  This is (probably) the most important piece of the puzzle, and once it&#39;s in place it really makes the whole user experience very seamless.</p>
+<h2 is-upgraded>EXERCISE 1</h2>
+<aside class="special"><p>Modify the CDS Hooks service to include the ‘draft order&#39; in the <code>appContext</code> link.  The idea is that to update the draft order, the app will make changes to it and send it back as the payload of a <code>postMessage</code>.</p>
+</aside>
+<h2 is-upgraded>EXERCISE 2</h2>
+<aside class="special"><p>Use the following implementation of <code>updateApp</code> to simply send the unchanged draft order back to the EHR, confirming in the <code>Messages</code> panel that the order payload was received.</p>
+<pre><code>function updateApp() {
+  targetWindow.postMessage({
+    payload: appContext.draftOrder,
+    messagingHandle,
+    messageId: uuidv4(),
+    messageType: &#39;TODO: consult the docs to determine what this should be&#39;,
+  }, targetOrigin);
+  closeApp();
+}
+</code></pre>
+</aside>
+<h2 is-upgraded>EXERCISE 3</h2>
+<aside class="special"><p>Insert the following code to help you apply the form values to a <code>pama-rating</code> extension object.  Once this attribute has been added to the draft order, the EHR will use it to update the pending order, annotating it with evidence that the guideline app has been consulted prior to the order being signed!</p>
+<pre><code>QCDSMID = &#39;G1011&#39;;
+...
+function addRating(draftOrder, rating) {
+  draftOrder.resource.extension = [
+    &#39;TODO: use the docs to build a pama-rating CodeableConcept&#39;
+  ];
+}
+function applyFormData(draftOrder) {
+  const orderId = document.getElementById(&#39;procedures&#39;);
+  const orderText = document.getElementById(orderId.value).innerText;
+  const indicationId = document.getElementById(&#39;indications&#39;);
+  const indicationText = document.getElementById(indicationId.value).innerText;
+  draftOrder.resource.code.coding[0].code = orderId.value;
+  draftOrder.resource.code.coding[0].display = orderText;
+  draftOrder.resource.reasonCode[0].coding[0].code = indicationId.value;
+  draftOrder.resource.reasonCode[0].coding[0].display = indicationText;
+}
+function updateApp() {
+  const draftOrder = appContext.draftOrder;
+  const rating = getRating();
+  applyFormData(draftOrder);
+  addRating(draftOrder, rating);
+  targetWindow.postMessage({
+    payload: draftOrder,
+    messagingHandle,
+    messageId: uuidv4(),
+    messageType: &#39;TODO: consult the docs to determine what this should be&#39;,
+  }, targetOrigin);
+  closeApp();  // TODO: consider commenting this line out while developing...
+}
+</code></pre>
+</aside>
+<h2 is-upgraded>EXERCISE 4</h2>
+<aside class="special"><p>Confirm that the EHR is being updated when you click the ‘Update EHR&#39; button.  You should see the selected values in the CDS Hooks sandbox Orders and Reasons panels.  You should also see evidence of received messages in the <code>Messages</code> section of the CDS Developer Panel.</p>
+</aside>
+<h2 is-upgraded>EXERCISE 5</h2>
+<aside class="special"><p><strong>Instructions</strong></p>
 <ul>
-<li>TODO: provide the code to apply auc logic to the form (the Evaluate button)</li>
-<li>EXERCISE: Ask user to implement the updateApp function</li>
-<li>TEST: confirm that updates in the launched app update the CDS Hooks sandbox</li>
+<li>In the CDS Hooks sandbox, select an Order and Reason combination that is rated as ‘not-appropriate&#39;.</li>
+<li>Click the SMART launch card link, launching the SMART app</li>
+<li>Select a combination that is ‘appropriate&#39;.</li>
+<li>Confirm that the app rates it as appropriate by clicking the <code>Evaluate</code> button.</li>
+<li>Click the <code>Update EHR</code> button to update the EHR and close the app.</li>
+<li>Confirm that the EHR shows the same Order and Reasons that you selected in the app.</li>
+<li>Confirm that the EHR displays an ‘appropriate&#39; rating in the CDS Hooks card.</li>
+<li>Confirm that when clicking the SMART launch card link, the displayed form still shows the expected selections.</li>
 </ul>
+</aside>
+<h2 is-upgraded>EXERCISE 6</h2>
+<aside class="special"><p>Go celebrate!  You have worked hard to get here and you deserve something fun.</p>
+</aside>
+<h2 is-upgraded>EXERCISE 7 (BONUS)</h2>
+<aside class="special"><p>Submit feedback on this codelab to the authors!  This ‘codelab&#39; is an experimental format of teaching the technology and the authors are looking for input from the community.<br><br>Sign the guestbook when you have completed the codelab.<br><a href="https://github.com/microsoft-healthcare-madison/demo-auc-app/wiki/Guestbook" target="_blank">https://github.com/microsoft-healthcare-madison/demo-auc-app/wiki/Guestbook</a><br><br>If you have found any bugs or overly-confusing sections during the process, please click the <a href="https://github.com/microsoft-healthcare-madison/demo-auc-app/issues" target="_blank">Report a mistake</a> link in the lower left and create an <code>issue</code> so we can track the problem and correct it.<br><br>THANK YOU!<br></p>
+</aside>
 <h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
 <h3 is-upgraded>TODO: populate these as they are asked</h3>
 <aside class="warning"><p>Please ask questions as you think of them!</p>
