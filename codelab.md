@@ -858,7 +858,7 @@ Negative
 : Please ask questions as you think of them!
 
 ## appContext
-Duration: 10
+Duration: 45
 
 ### Problem
 Negative
@@ -927,24 +927,24 @@ Negative
 : Please ask questions as you think of them!
 
 ## SMART Web Messaging
-Duration: 60
+Duration: 15
 
 ### Problem
 <dt>Negative</dt>
-<div>We've done a great job launching the app from the EHR, complete with all the relevant context available to us.  However, any changes we make to the form will not automatically apply to the EHR selections, so the user will have to remember what she did and re-create that work after closing the app.  This is still far from ideal.
+<div>We've done a great job modifying the original app so it can be launched from the EHR, complete with all the relevant EHR context being automatically populated.  However, any changes made by the user in the form will not automatically apply to the EHR selections, so users will have to remember what changed in the app and then re-create that work in the EHR after closing the app.  This is better, but still far from ideal.
 </div>
 
 ### Solution
 <dt>positive</dt>
-<div>We will enable the app to update the EHR selection by providing a new 'update' button.  We'll also provide a 'cancel' button.
+<div>We will enable the app to *update* the EHR selection by providing a new 'Update EHR' button.  We'll also provide a 'Close App' button.  These two functions will 'close the loop', allowing a seamless integration of the AUC app within the EHR.
 </div>
 
 ### Design
-Recall the new app features from the codelab introduction
+Recall the new app features that were introduced in the exercise outline.
 
 ![embedded-app](images/embedded_final_app.png)
 
-In the final remaining sections of this codelab, you will implement several exercised to complete the missing functionality.
+In the final remaining sections of this codelab, you will implement several exercises to complete the missing functionality.
 
 ### Missing Functionality
 
@@ -957,21 +957,129 @@ Please refer to the SMART Web Messaging docs: <https://github.com/smart-on-fhir/
 
 ### EXERCISE 1
 Positive
-: Find in the docs the changes to the requested scopes that will be necessary to complete the missing functionality.
+: Find in the docs which scopes are necessary to complete the missing functionality.
 
+### EXERCISE 2
+Positive
+: Modify your `launch.html` to include those additional scopes.  Confirm that your app can still SMART launch with the new scopes in place.
+
+### EXERCISE 3
+Positive
+: Looking at the docs, identify which `scratchpad` operation is needed to enable the functionaly which will change the EHR's pending order to match the values selected in the app form.
+
+### Frequently Asked Questions
+
+#### TODO: populate these as they are asked
+Negative
+: Please ask questions as you think of them!
+
+## Buttons!
+Duration: 10
+
+### Button Panel
+Add the following button panel to your `index.html` site.  By default, the button frame will be disabled on load, but after the SMART client has been loaded, it will be made visible.
+
+```js
+<div id='button_panel' style='display:none'>
+  <button id="close_btn" onclick='closeApp()' style='background-color: rgb(255, 95, 95);'>
+    Close App
+  </button>
+  <button id="update_btn" onclick='updateApp()' style='background-color: rgb(127, 255, 95);'>
+    Update EHR
+  </button>
+</div>
+...
+function showButtons() {
+  document.getElementById('button_panel').style.display = 'block';
+}
+...
+FHIR.oauth2.ready()
+  .then(getContext)
+  .then(populateForm)
+  .then(showButtons)  // <- SHOW BUTTON PANEL!
+  .catch(console.error);
+...
+function closeApp() {
+  // TODO: implement this
+}
+function updateApp() {
+  // TODO: implement this
+}
+```
+
+### Closing the App
+To enable the app-closing functionality, you should have identified in the previous section that you need the following in your app.
+
+- The FHIR client must have requested the `messaging/ui` scope upon launch.
+- The `postMessage` function must be used to send a `ui.done` message to the EHR.
+
+In the following section we'll dig in to how sending messages can be done and implement the `closeApp` function.
+
+### Frequently Asked Questions
+
+#### TODO: populate these as they are asked
+Negative
+: Please ask questions as you think of them!
+
+## Sending Messages
+Duration: 20
+
+In order to send messages to the EHR, the client code must do the following:
+
+- Determine which window needs to receive the messages via `postMessage`.
+
+  - Use `window.parent.postMessage` when the client is running embedded in an `iframe`.
+  - Use `window.opener.postMessage` when the client is launched into a separate browser.
+- Generate a unique UUID per message.
+- Provide the SMART Web Messaging Handle received from the server upon launch.
+
+### `targetWindow`
+You can use the ternary operator to deduce the `targetWindow`.
+
+```js
+const targetWindow = window.parent !== window.self ? window.parent : window.opener;
+```
+
+### UUIDs
+One potential library to use for generating UUIDs in your code is found here:
+<https://www.npmjs.com/package/uuid#quickstart---browser-ready-versions>
+
+This library provides this in-browser usage:
+
+```js
+<script src="http://wzrd.in/standalone/uuid%2Fv4@latest"></script>
+<script>
+uuidv4(); // -> v4 UUID
+</script>
+```
+
+### SMART Web Messaging Handle
+TODO(carl): update the `master` branch to have a correct implementation and reference it here.
+
+### EXERCISE 1
+Positive
+: Add the aforementioned code pieces to your `index.html` page so you are able to invoke `targetWindow.postMessage` within the `closeApp` function.  Add any missing parameters so that the invocation is capable of closing the app.
+
+### Frequently Asked Questions
+
+#### TODO: populate these as they are asked
+Negative
+: Please ask questions as you think of them!
+
+## Updating the EHR
+Duration: 20
 
 Outline
 
-- TODO: link to the documentation.
-<https://github.com/smart-on-fhir/smart-web-messaging>
-
-- TODO: Link to the SMART Web Messaging docs
-- EXERCISE: Ask user to implement the closeApp function using window.postMessage
 - TODO: provide the code to apply auc logic to the form (the Evaluate button)
 - EXERCISE: Ask user to implement the updateApp function
 - TEST: confirm that updates in the launched app update the CDS Hooks sandbox
 
 ### Frequently Asked Questions
+
+#### TODO: populate these as they are asked
+Negative
+: Please ask questions as you think of them!
 
 ## Bonus Exercies
 

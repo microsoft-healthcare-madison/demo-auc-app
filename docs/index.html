@@ -707,7 +707,7 @@ const cardDetails = {
 
       </google-codelab-step>
     
-      <google-codelab-step label="appContext" duration="10">
+      <google-codelab-step label="appContext" duration="45">
         <h2 is-upgraded>Problem</h2>
 <aside class="warning"><p>Now that we&#39;ve succeeded in using the EHR to steer clinicians to the demo app, we need to receive the contextual EHR data about the current pending order somehow.  Otherwise the app does not have a way to evaluate the pending order details.</p>
 </aside>
@@ -764,17 +764,17 @@ function populateForm(context) {
 
       </google-codelab-step>
     
-      <google-codelab-step label="SMART Web Messaging" duration="60">
+      <google-codelab-step label="SMART Web Messaging" duration="15">
         <h2 is-upgraded>Problem</h2>
-<aside class="warning"><p>We&#39;ve done a great job launching the app from the EHR, complete with all the relevant context available to us.  However, any changes we make to the form will not automatically apply to the EHR selections, so the user will have to remember what she did and re-create that work after closing the app.  This is still far from ideal.<br></p>
+<aside class="warning"><p>We&#39;ve done a great job modifying the original app so it can be launched from the EHR, complete with all the relevant EHR context being automatically populated.  However, any changes made by the user in the form will not automatically apply to the EHR selections, so users will have to remember what changed in the app and then re-create that work in the EHR after closing the app.  This is better, but still far from ideal.<br></p>
 </aside>
 <h2 is-upgraded>Solution</h2>
-<aside class="special"><p>We will enable the app to update the EHR selection by providing a new ‘update&#39; button.  We&#39;ll also provide a ‘cancel&#39; button.<br></p>
+<aside class="special"><p>We will enable the app to <em>update</em> the EHR selection by providing a new ‘Update EHR&#39; button.  We&#39;ll also provide a ‘Close App&#39; button.  These two functions will ‘close the loop&#39;, allowing a seamless integration of the AUC app within the EHR.<br></p>
 </aside>
 <h2 is-upgraded>Design</h2>
-<p>Recall the new app features from the codelab introduction</p>
+<p>Recall the new app features that were introduced in the exercise outline.</p>
 <p class="image-container"><img alt="embedded-app" src="img/d305f11b4c68b4d7.png"></p>
-<p>In the final remaining sections of this codelab, you will implement several exercised to complete the missing functionality.</p>
+<p>In the final remaining sections of this codelab, you will implement several exercises to complete the missing functionality.</p>
 <h2 is-upgraded>Missing Functionality</h2>
 <ul>
 <li>The app needs to be able to inform the EHR that it is ‘all done&#39; so the EHR knows it can close the iframe used to embed the app.  This is essentially how the ‘cancel&#39; button is implemented.</li>
@@ -784,18 +784,113 @@ function populateForm(context) {
 <h2 is-upgraded>Reference</h2>
 <p>Please refer to the SMART Web Messaging docs: <a href="https://github.com/smart-on-fhir/smart-web-messaging" target="_blank">https://github.com/smart-on-fhir/smart-web-messaging</a></p>
 <h2 is-upgraded>EXERCISE 1</h2>
-<aside class="special"><p>Find in the docs the changes to the requested scopes that will be necessary to complete the missing functionality.</p>
+<aside class="special"><p>Find in the docs which scopes are necessary to complete the missing functionality.</p>
 </aside>
-<p>Outline</p>
+<h2 is-upgraded>EXERCISE 2</h2>
+<aside class="special"><p>Modify your <code>launch.html</code> to include those additional scopes.  Confirm that your app can still SMART launch with the new scopes in place.</p>
+</aside>
+<h2 is-upgraded>EXERCISE 3</h2>
+<aside class="special"><p>Looking at the docs, identify which <code>scratchpad</code> operation is needed to enable the functionaly which will change the EHR&#39;s pending order to match the values selected in the app form.</p>
+</aside>
+<h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
+<h3 is-upgraded>TODO: populate these as they are asked</h3>
+<aside class="warning"><p>Please ask questions as you think of them!</p>
+</aside>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Buttons!" duration="10">
+        <h2 is-upgraded>Button Panel</h2>
+<p>Add the following button panel to your <code>index.html</code> site.  By default, the button frame will be disabled on load, but after the SMART client has been loaded, it will be made visible.</p>
+<pre><code>&lt;div id=&#39;button_panel&#39; style=&#39;display:none&#39;&gt;
+  &lt;button id=&#34;close_btn&#34; onclick=&#39;closeApp()&#39; style=&#39;background-color: rgb(255, 95, 95);&#39;&gt;
+    Close App
+  &lt;/button&gt;
+  &lt;button id=&#34;update_btn&#34; onclick=&#39;updateApp()&#39; style=&#39;background-color: rgb(127, 255, 95);&#39;&gt;
+    Update EHR
+  &lt;/button&gt;
+&lt;/div&gt;
+...
+function showButtons() {
+  document.getElementById(&#39;button_panel&#39;).style.display = &#39;block&#39;;
+}
+...
+FHIR.oauth2.ready()
+  .then(getContext)
+  .then(populateForm)
+  .then(showButtons)  // &lt;- SHOW BUTTON PANEL!
+  .catch(console.error);
+...
+function closeApp() {
+  // TODO: implement this
+}
+function updateApp() {
+  // TODO: implement this
+}
+</code></pre>
+<h2 is-upgraded>Closing the App</h2>
+<p>To enable the app-closing functionality, you should have identified in the previous section that you need the following in your app.</p>
 <ul>
-<li>TODO: link to the documentation.<br><a href="https://github.com/smart-on-fhir/smart-web-messaging" target="_blank">https://github.com/smart-on-fhir/smart-web-messaging</a></li>
-<li>TODO: Link to the SMART Web Messaging docs</li>
-<li>EXERCISE: Ask user to implement the closeApp function using window.postMessage</li>
+<li>The FHIR client must have requested the <code>messaging/ui</code> scope upon launch.</li>
+<li>The <code>postMessage</code> function must be used to send a <code>ui.done</code> message to the EHR.</li>
+</ul>
+<p>In the following section we&#39;ll dig in to how sending messages can be done and implement the <code>closeApp</code> function.</p>
+<h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
+<h3 is-upgraded>TODO: populate these as they are asked</h3>
+<aside class="warning"><p>Please ask questions as you think of them!</p>
+</aside>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Sending Messages" duration="20">
+        <p>In order to send messages to the EHR, the client code must do the following:</p>
+<ul>
+<li>Determine which window needs to receive the messages via <code>postMessage</code>.<ul>
+<li>Use <code>window.parent.postMessage</code> when the client is running embedded in an <code>iframe</code>.</li>
+<li>Use <code>window.opener.postMessage</code> when the client is launched into a separate browser.</li>
+</ul>
+</li>
+<li>Generate a unique UUID per message.</li>
+<li>Provide the SMART Web Messaging Handle received from the server upon launch.</li>
+</ul>
+<h2 is-upgraded><code>targetWindow</code></h2>
+<p>You can use the ternary operator to deduce the <code>targetWindow</code>.</p>
+<pre><code>const targetWindow = window.parent !== window.self ? window.parent : window.opener;
+</code></pre>
+<h2 is-upgraded>UUIDs</h2>
+<p>One potential library to use for generating UUIDs in your code is found here:<br><a href="https://www.npmjs.com/package/uuid#quickstart---browser-ready-versions" target="_blank">https://www.npmjs.com/package/uuid#quickstart—browser-ready-versions</a></p>
+<p>This library provides this in-browser usage:</p>
+<pre><code>&lt;script src=&#34;http://wzrd.in/standalone/uuid%2Fv4@latest&#34;&gt;&lt;/script&gt;
+&lt;script&gt;
+uuidv4(); // -&gt; v4 UUID
+&lt;/script&gt;
+</code></pre>
+<h2 is-upgraded>SMART Web Messaging Handle</h2>
+<p>TODO(carl): update the <code>master</code> branch to have a correct implementation and reference it here.</p>
+<h2 is-upgraded>EXERCISE 1</h2>
+<aside class="special"><p>Add the aforementioned code pieces to your <code>index.html</code> page so you are able to invoke <code>targetWindow.postMessage</code> within the <code>closeApp</code> function.  Add any missing parameters so that the invocation is capable of closing the app.</p>
+</aside>
+<h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
+<h3 is-upgraded>TODO: populate these as they are asked</h3>
+<aside class="warning"><p>Please ask questions as you think of them!</p>
+</aside>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Updating the EHR" duration="20">
+        <p>Outline</p>
+<ul>
 <li>TODO: provide the code to apply auc logic to the form (the Evaluate button)</li>
 <li>EXERCISE: Ask user to implement the updateApp function</li>
 <li>TEST: confirm that updates in the launched app update the CDS Hooks sandbox</li>
 </ul>
 <h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
+<h3 is-upgraded>TODO: populate these as they are asked</h3>
+<aside class="warning"><p>Please ask questions as you think of them!</p>
+</aside>
 
 
       </google-codelab-step>
