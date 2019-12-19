@@ -234,12 +234,12 @@ You can use any non-empty username and password to log in to the app.
 <dt>negative</dt>
 <div>
 
-| Age | Gender | Indication               | Procedure                          |
-|-----|--------|--------------------------|------------------------------------|
-| Age | Gender | Indication               | Procedure                          |
-| 4   | male   | lower back pain          | lumbar spine CT                    |
-| 98  | female | congenital heart disease | cardiac mri                        |
-| 29  | female | headache                 | ct scan without contrast materials |
+| Age     | Gender     | Indication               | Procedure                          |
+|---------|------------|--------------------------|------------------------------------|
+| **Age** | **Gender** | **Indication**           | **Procedure**                      |
+|       4 |       male | lower back pain          | lumbar spine CT                    |
+|      98 |     female | congenital heart disease | cardiac mri                        |
+|      29 |     female | headache                 | ct scan without contrast materials |
 </div>Be sure to *also* try any of the above tests, but with a missing field.  The app should require you to enter a value for each field (without doing any *additional* sanity checking, though).
 </div>
 
@@ -286,13 +286,14 @@ There is a very handy javascript library to enable easy configuration of SMART l
 <http://docs.smarthealthit.org/client-js/>
 
 ### EXERCISE 1
-Positive
-: Consult the link above, and create a `launch.html` endpoint.
+<dt>positive</dt>
+<div>Consult the link above, and create a `launch.html` endpoint.
 
 Negative
-: *Confused?*  Part of the goal of this codelab is to get you familiar with using the documentation, so there will be minimal hand-holding throughout.
+: *Confused?*  Part of the goal of this codelab is to get you familiar with using the documentation, so sometimes there will be minimal hand-holding.
+</div>
 
-Here are a couple of hints, in case this seems like a vague request.  
+Here are a couple of hints, in case this seems like a vague request.
 
 - You may need to use the `npm` command to install the library.
 - Once installed, you will want to create an endpoint 'page' for use in a browser using the 'As Library' approach, rather than the 'As Module' approach.
@@ -517,12 +518,12 @@ You may view the solution in [this PR](https://github.com/microsoft-healthcare-m
 
 ### EXERCISE 2
 <dt>positive</dt>
-<div>Confirm that your changes work by SMART-launching the app from the SMART App Launch portal.  You will know you are complete when the form fields are automatically updated to match the patient you select in the patient picker.</div>
+<div>Confirm that your changes work by SMART-launching the app from the SMART App Launch portal.  You will know you are complete when the form fields are automatically updated to match the patient you select in the patient picker.<br>
+Confirm in the javascript console that there are no errors or stray messages.</div>
 
 ### EXERCISE 3 (BONUS)
 <dt>positive</dt>
-<div>Now that the app is capable of a SMART Launch, you can remove lots of the session / authentication logic in `index.js` to simplify things.
-
+<div>Now that the app is capable of a SMART Launch, you can remove lots of the session / authentication logic in `index.js` to simplify things.<br>
 Remove the legacy login and authentication code from the existing `index.js` script.</div>
 
 ### Frequently Asked Questions
@@ -536,7 +537,7 @@ Duration: 90
 
 ### Problem
 <dt>negative</dt>
-<div>While we have improved the situation greatly by giving the app the ability to SMART Launch, we still have not addressed the concern that the provider needs to specifically remember when to use this app. Without contextual reminders, a guidelines app us unlikely to see widespread adoption within the ordering workflow for advanced diagnostic medical imaging.
+<div>While we have improved the app login situation *greatly* by giving the app the ability to SMART Launch, we still have not addressed the concern that the provider needs to specifically remember *when* to use this app.  Without contextual reminders, a guidelines app us unlikely to see widespread adoption within the ordering workflow for advanced diagnostic medical imaging.
 </div>
 
 ### Solution
@@ -561,10 +562,10 @@ If you follow the overall flow of CDS Hooks in the diagram above, you can see ho
 ## CDS Hooks Discovery Endpoint
 Duration: 20
 
-There will be several important concepts of CDS Hooks that need to be understood to make this service work as intended.  The most logical starting-place, though, is the [CDS Hooks discovery endpoint](https://github.com/cerner/cds-services-tutorial/wiki/Discovery-Endpoint).
+You must understand **several** CDS Hooks concepts to make this service work as intended; however, the most logical starting-place is the [CDS Hooks discovery endpoint](https://github.com/cerner/cds-services-tutorial/wiki/Discovery-Endpoint).
 
 ### Discovery
-To run a CDS Hooks service, that service must provide a discovery endpoint which describes all the CDS Hooks that your service is interested in.  In this case, we want our service to be posted-to whenever the `order-select` hook in the EHR is activated.  This will allow the service to process the current order selection and return the desired 'card' data (which is then displayed by the EHR to the provider).
+To run a CDS Hooks service, that service must provide a discovery endpoint which describes all the CDS Hooks that your service is interested in.  In this case, we want the EHR to post a message to our service whenever the `order-select` hook is activated.  This will allow the service to process the *currently pending* order selection and return the desired 'card' data (which is then displayed by the EHR to the provider).
 
 #### Documentation
 You can read more details about the `order-select` hook here: <https://cds-hooks.org/hooks/order-select/>
@@ -626,7 +627,8 @@ To test and develop your CDS Hooks service, it's recommended to use one of the s
 <dt>positive</dt>
 <div>**Instructions**
 
-- Select the PAMA Imaging tab, if not already selected.
+- Launch the sandbox: <http://sandbox.cds-hooks.org>
+- Select the **PAMA Imaging** tab, if not already selected.
 - Enter the number `72133` in the 'Search orders' box.  This is a CPT procedure code for lumbar spine CT.
 - Select the auto-suggested 'CT, lumbar spine' order, which should be the only suggestion.
 - Enter `low back pain` in the 'Search reasons' box and select the top result.
@@ -643,7 +645,7 @@ To test and develop your CDS Hooks service, it's recommended to use one of the s
 
 - Delete the selected order and reason, if any are selected.
 - Type `congenital heart` into the 'Search reasons' box and select the top suggestion.
-- Notice how a card has appeared on the left side of the screen.
+- Notice how a card has appeared on the lower left side of the screen.
 - Select the `pama-imaging` service from the drop-down on the right, if not already selected.
 - Observe the structure of the Card definition within the `Response` message in the CDS Developer Panel.  This card was generated *by* the `pama-imaging` CDS service, which is running remotely at <https://fhir-org-cds-services.appspot.com>.
 
@@ -651,7 +653,7 @@ To test and develop your CDS Hooks service, it's recommended to use one of the s
 
 ### EXERCISE 3
 Positive
-: See if you can discover the complete list of CDS Services at <https://fhir-org-cds-services.appspot.com> by modifying the URL (or adding something to it).
+: See if you can discover the complete list of CDS Services at <https://fhir-org-cds-services.appspot.com> by modifying the URL above (hint: try *adding* something to it).
 
 ### EXERCISE 4
 <dt>positive</dt>
@@ -659,25 +661,26 @@ Positive
 
 - Configure the CDS Hooks Sandbox to use your local CDS Hooks service by providing it with your discovery endpoint (which should be somewhere on `http://localhost`).
 - Change the selected service in the CDS Developer Panel to your new service, which should apear as `demo-auc-app`.
+- Notice that the sandbox is now sending CDS Hook events to your local service **and** the default remote ones.
 
 </div>
 
 ### Frequently Asked Questions
 
-#### TODO: populate these as they are asked
+#### EXERCISE 2 - After selecting the top suggestion for `congenital heart` - I didn't see a card appear.
 Negative
-: Please ask questions as you think of them!
+: Be sure you entered `congenital heart` in the **Reasons** box, and not in the **Orders** box.
 
 ## AUC Logic
 Duration: 20
 
 ### Problem
 Negative
-: We want the user to be visually alerted in the EHR when they have selected an order where AUC guidelines should be consulted while ordering.  For this to work, the CDS Hooks service must be able to evaluate the pending order against AUC guidelines, so a card of the appropriate severity can be displayed.  However, the logic is all currently available in a separate service.
+: We want the user to be visually alerted in the EHR when they have selected an order where AUC guidelines should be consulted *while* ordering.  For this to work, the CDS Hooks service must be able to evaluate the *draft* order against AUC guidelines, so a card of the appropriate severity can be displayed.  However, the AUC logic is all currently available in a separate service.
 
 ### Solution
 Positive
-: We will extract the AUC logic from the other service, making it available as a module to the CDS Hooks service.  Alternatively, if the app had provided an API, the CDS Hooks service could use that API as order items are selected to determine appropriateness.  Either works, but in this case the logic is easy enough to isolate as a module.
+: We will extract the AUC logic from the other service, making it available as a *module* to the CDS Hooks service.  Alternatively, if the app had provided an API, the CDS Hooks service could use that API as draft order items are selected to determine appropriateness.  Either works, but in this case the logic is easy enough to isolate as a module.
 
 ### `auc.js`
 The following can be loaded by both the app and the CDS Hooks service to determine the appropriateness rating of an order / diagnosis combination.
@@ -763,21 +766,21 @@ module.exports = {
 - Import the module in your CDS Hooks service (a la `const auc = require('./auc.js');`).
 - Use the imported functionality to determine which appropriate-ness score the current selection has using the currently-selected orders and diagnoses.
 
+Negative
+: You may struggle here a bit learning how to extract the currently selected order and diagnosis from the current Request message.  Remember that the CDS Developer Panel in the sandbox UI is your friend.  Also, take advantage of the javascript developer console for quick debugging.
+
 </div>
 
-Negative
-: You may struggle here a bit learning how to extract the currently selected order and diagnosis from the current Request message.  Remember that the CDS Developer Panel in the sandbox UI is your friend.
-
-### EXERCISE 2 (OPTIONAL)
+### EXERCISE 2 (BONUS)
 Positive
-: Refactor the old service to remove the AUC logic from it, replacing it with a module import of the new `auc.js` code.
+: Refactor the old service (in `index.js`) to remove the AUC logic from it, replacing it with a module import of the new `auc.js` code.  This should *dramatically* reduce the code complexity.
 
 ## Playing with Cards
 Duration: 20
 
 ### Problem
 Negative
-: We want the EHR interface to display a card based on selection.  Also, when the current selection is outside of guideline recommendations, the displayed card should be eye-catching.  When the selection is *within* guidelines, it should be recognizable as 'good'.
+: We want the EHR order entry screen to display an eye-catching card based on the current selection.  Also, when the selection is *outside* of guideline recommendations, the displayed card should be especially eye-catching.  When the selection is *within* guidelines, it should clearly and pleasantly be recognizable as 'good'.
 
 ### Solution
 Positive
@@ -799,32 +802,38 @@ You can find lots of information about CDS Hooks cards here:
 ### A Head Start
 The following code snippet will help you get started matching the look of the intended output.
 
+Insert it into your CDS Hooks service code.  With that in place, all you have to do is map `appripriate` (or the other ratings) to the custom card attributes needed to render the desired cards (some other *generic* attributes may also be needed, too).
+
 ```js
+const images = 'https://github.com/microsoft-healthcare-madison/demo-auc-app/tree/master/images/';
 const cardDetails = {
   'appropriate': {
     detail: 'This order meets AUC guidelines.',
-    icon: 'https://lh3.googleusercontent.com/bYNztCIytfV24Hzu9O11XcMhcHdcjRbX0TX2JfxX_LN-tKOOvqQi1lAhmBv7hY8UbMBmshW9vq3jFMO5kbCbq4fTsSWmlccsknxRvtGNunP_IktjIAn38prInj-6f6qWcTk3A9C3kkkJIilgeWOeOy3j8rifvViasCyhm5AGxeBs0TwyLIS-rV7LJDEWI9PjhTPcalYmvZBpl5Yti073BFHlBdMQH98D4CLQle9ZOR8zvXs43NGQdDFRk6QYplv7WFy6veT8b_sGeGxssvPVQoL9Kzcdagd1ftrvsY9vEzm9U79x4u9sBH_kw-BjyJilBh3ZLcTISbuSN-zT3Xn77uOh-aIemSKnr7jl33Ex3i0JyqxMcmj1Wc7cH4sCEHJ7bku3yZYndzVZgjvyPOV44EWo5OyDNVdQ22Hv4LbbSGQku0NCiSbm8g17rb3agKRnjmgioe6kWpa4lH16Q80FuRmAyYZ0GbBJl407qRrmMN-oO9R_LnzIABoV8BPyfU4BvsTDO_GZMBlaoy2K1Qv-0RL9faAjpN6iNQdofpJ28qn07MjJM-vHqPyD3U-eA8RgpSsofQscgE57GrSDDLRhgev3iyhhu2XU4pHbvmd4UUf82a2W0_OYkOlkeiTXM_YdrrW7E2Zpp2pWoIhZJIgXAVuaIz4v6k6EREPeBUuYiAoJHNs-UNXg3cvz=s100-no',
+    icon: images + 'appropriate.png',
     indicator: 'success',
   },
   'no-guidelines-apply': {
     detail: 'This order is not specified by AUC guidelines.',
-    icon: 'https://lh3.googleusercontent.com/fLQElMed2CFqAHxwRlIe5gJoHp9PFyZUPEcjgdB2Jj2dL7tHKfg4potyo39gsQeP_6wQ7zkWXaMGR7KnfkDrW1ks0jYaHmMdFi-AUer53CQCkKBwkgIEtgRSlozLDqiqpTBMIGRfsj_6oYtruy8O1cFEI54xSjXGtC3l3HThdk93lOjwbxdmqshbkYvm1XYTNcJuBQBdYgIEJusjX_RDBTvJiAxQ0lBeYSHjGBE8JibvQjLboSqNwefLVbIZ24LUenGoub9Y8mhVlxUeQMQPYclnn5W5Nj509L0Oc65ZAvLhoqAJs_sI6gr7ViJqkgdGfRe2pAXbikX2vBvLRHMktcGD5J_YVYTst5vrvfnhfhE0P-kPSp4XLt4WrfP5OQe7lysg-EFyiK6F7REP7NmiPy8x8hf9O9GuUoPFqXwU4psdoXbuNpCsuPA6tfnU6QwC-vUvzOWJgF1bMpu8NimhqPrOgBAUAHh0eVh9p3_ix8OwKBZ70EX8a7E9mq67k0-rTtMoElwBkFNzArTsMd1xp6QboF0F-oV_Li7xje_7Fokn-nDbB72ULX9K-MVbSkZvhD7Y_hJwQPG6wWF4kHaX_zzZsdD5botGT2VMrF-wGklzRrh2bBS-jT12IAeBECGgO_XKOu3Ire3WQ0SUdYGpE5Ebs4KrWAOykznsL9OqfkVuD1SIwjKgR-A2=s100-no',
+    icon: images + 'no-guidelines-apply.png',
     indicator: 'warning'
   },
   'not-appropriate': {
     detail: 'This order does not meet AUC guidelines.',
-    icon: 'https://lh3.googleusercontent.com/6f3-twVm-TIZr0IWsb4Yuiys58PkeV3RU89XSDjRtV2beBiKxsoSg4-7qNgzLkZZf-Vy-1OoG5pswPQSK8XRuW3lE56wQgkItirK-iBozZMoD5JvcOR6ZxusPjrvMOE-iwaOKYZxnk0qyoDu7W4WQfaTDaGXAL26OuV_VBIxL0SSXzONWCrk70ckTJPzGy7detQTWknOZJNLuLEv0N45q_EoOu6SLgUlf3woVe-zm0JMNV68JsXH5FIlRwidaplY19MnY40If0fGtQkvnrNS4lwZ9pnx_PK_wiTJhhnpfuNRvrhy_Bdphsy_CN0fMj2FfrwhOJl48jlg8IvIkMzDMlEZGthzryIhN2B-94Eq2oNZS9JaAixqLg2P06_HcaVWMi5x6slPMCal_sU78yuta5lNZdxS7XYw9xJWLjW8Mu_LPKoA6m0onGcYLnwYkdXLFvqdF4dWKYOx1uFvPAMOsucST4orXqVTFWFiEm39et-ZUVOArLm9yXh8i4zl5PKTs4sA7c4u8CLwLyW04Unkg59KnL0ZNKX0xRNm052pW_WhX2g48oKjPIqnQ6Zl1omgNgzIyHo2mvpIKstENpGJwsIqNO456kWEbgUmydTZn40d-VdG47d5Xg5R0jl-WGrK_FbG8u0DupeeCE9kRo2GTrqUuVZWOPZnHJqLnJRWsvEdybsWqC5_m8Fz=s100-no',
+    icon: images + 'not-appropriate.png',
     indicator: 'critical',
   },
 };
 ```
 
 ### EXERCISE 1
-Positive
-: Using the appropriate-ness rating from the previous exercise, have your service return a list of cards that use the intended icon, detail, and indicator.  DO NOT worry about creating the app link in this exercise!
+<dt>Positive</dt>
+<div>Using the appropriate-ness rating from the previous exercise, have your service return a list of cards that use the intended icon, detail, and indicator.  DO NOT worry about creating the app link in this exercise!
 
-Negative
-: Again, remember that the CDS Developer Panel is your friend.  Also, remember that when you enter `Congenital heart disease` as a 'Reason' - the `pama-imaging` service will return a card.  You can quickly switch the selected service in the CDS Developer Panel to see what the Response payload looks like while developing your own service.
+<dt>Negative</dt>
+<div>Again, remember that the CDS Developer Panel is your friend.  Also, remember that when you enter `Congenital heart disease` as a 'Reason' - the `pama-imaging` service will return a card.  You can quickly switch the selected service in the CDS Developer Panel to see what the Response payload looks like while developing your own service.<br>
+Also, you can *disable* the `pama-imaging` service in the sandbox if you prefer to only see the card returned by your service.
+</div>
+</div>
 
 ### EXERCISE 2
 <dt>Positive</dt>
@@ -836,10 +845,11 @@ links: [{
   type: 'smart'
 }],
 ```
-</div>
 
 Negative
-: The links, as shown above, should be able to launch the app - but they still don't demonstrate how EHR data is passed to the external app.  There's a missing step that we'll get to in another section (soon, though).
+: The links, as shown above, should be able to launch the app - but they still don't demonstrate how EHR data is **passed** to the external app.  There's a missing step that we'll get to in another section (soon, though).
+
+</div>
 
 ### Frequently Asked Questions
 
@@ -862,6 +872,8 @@ Positive
 
 - <https://cds-hooks.hl7.org/ballots/2018May/specification/1.0/#link>
 
+Spend a few minutes reading the documentation to get a feel for how the `appContext` attribute can be added to the links in the CDS Hooks service.
+
 ### EXERCISE 1
 Positive
 : Add an `appContext: {message: 'Hello, world!'}` field to your card links, just to test that it can be received on the client side.
@@ -870,6 +882,44 @@ Positive
 Positive
 : In the `index.html` code, confirm that the `appContext.message` value is being received upon SMART launch.  One way to do this is by using the javascript console.  Alternatively, you can insert the message into the rendered HTML temporarily.  However you prefer - please confirm that the data passed through `appContext` is received on the other end!
 
+### EXERCISE 3
+<dt>Positive</dt>
+<div>Serialize the data fields that are needed to populate the form selections in the app, namely, the selected Order and Diagnosis.  Confirm that they are being received upon SMART launch.
+</div>
+
+### EXERCISE 4
+<dt>positive</dt>
+<div>Modify your code in `index.html` so that the `getContext` function returns a context object containing an `indication` and an `order`, which will be used to populate the selected form `<input>` values.
+
+```js
+// File: index.html
+...
+async function getContext(client) {
+  const appContextStr = 'TODO - read from the client appContext';
+  appContext = JSON.parse(appContextStr);
+  const indications = appContext.indications || [-1];
+  const orders = appContext.orders || [-1];
+  return {
+    indication: indications.pop() || -1,
+    order: orders.pop() || -1,
+    patient: await client.patient.read(),
+    user: await client.user.read(),
+  };
+}
+
+function populateForm(context) {
+  ...
+  if (context.indication !== -1) {
+    document.getElementById('indications').value = context.indication;
+  }
+  if (context.order !== -1) {
+    document.getElementById('procedures').value = context.order;
+  }
+}
+```
+
+</div>
+
 ### Frequently Asked Questions
 
 #### TODO: populate these as they are asked
@@ -877,16 +927,44 @@ Negative
 : Please ask questions as you think of them!
 
 ## SMART Web Messaging
-
 Duration: 60
+
+### Problem
+<dt>Negative</dt>
+<div>We've done a great job launching the app from the EHR, complete with all the relevant context available to us.  However, any changes we make to the form will not automatically apply to the EHR selections, so the user will have to remember what she did and re-create that work after closing the app.  This is still far from ideal.
+</div>
+
+### Solution
+<dt>positive</dt>
+<div>We will enable the app to update the EHR selection by providing a new 'update' button.  We'll also provide a 'cancel' button.
+</div>
+
+### Design
+Recall the new app features from the codelab introduction
+
+![embedded-app](images/embedded_final_app.png)
+
+In the final remaining sections of this codelab, you will implement several exercised to complete the missing functionality.
+
+### Missing Functionality
+
+- The app needs to be able to inform the EHR that it is 'all done' so the EHR knows it can close the iframe used to embed the app.  This is essentially how the 'cancel' button is implemented.
+- The app needs to be able to update the current pending order based on whatever form values have been selected.  When a final selection has been made, the user will click the 'update' button to update the EHR and close the app.
+- Because the app currently uses a form to POST to a remote service for determining AUC appropriateness, it becomes awkward when trying to implement functionality that will allow the user to 'test out' various changes to order and diagnosis before updating the EHR.  So, ideally, instead of POST'ing to a remote service, the form can invoke a javascript *function* which will take advantage of the new `auc.js` module.
+
+### Reference
+Please refer to the SMART Web Messaging docs: <https://github.com/smart-on-fhir/smart-web-messaging>
+
+### EXERCISE 1
+Positive
+: Find in the docs the changes to the requested scopes that will be necessary to complete the missing functionality.
+
 
 Outline
 
-- TODO: introduce the design goals (show pictures of the wanted UI).
 - TODO: link to the documentation.
 <https://github.com/smart-on-fhir/smart-web-messaging>
 
-- TODO: Provide the code to update the html using the client context
 - TODO: Link to the SMART Web Messaging docs
 - EXERCISE: Ask user to implement the closeApp function using window.postMessage
 - TODO: provide the code to apply auc logic to the form (the Evaluate button)

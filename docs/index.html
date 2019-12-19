@@ -46,20 +46,19 @@
 <li>v2: Create a CDS Hooks service to evaluate a <em>draft</em> order in an EHR, and show a link to the SMART app.</li>
 <li>v3: Enable the SMART app to update the draft order inside the EHR.</li>
 </ul>
+<aside class="warning"><h3 is-upgraded>Note for Students</h3>
+<p>If you already have a good grasp of PAMA, the SMART launch process, and CDS Hooks, you can <strong>skip</strong> ahead and begin the process <em>after</em> the CDS Hooks implementation by checking out the code at <code>v2.0</code> in the repo and advancing to the section called <strong>SMART Web Messaging</strong> in this codelab.</p>
+<p>There&#39;s another git tag, <code>v3.0</code>, for the <strong>final</strong> solution.  Check out this version of the code if you just want to play with a working copy of the app.  However, if you&#39;re here to learn, it is recommended that you find time to do the full codelab.<br></p>
+</aside>
 
 
       </google-codelab-step>
     
       <google-codelab-step label="PAMA" duration="20">
         <h2 is-upgraded>PAMA - Protecting Access to Medicare Act of 2014</h2>
-<aside class="warning"><p><em>&#34;If we in the United States could lower the prices and per-capita volumes of our CT scans, MRIs, and just the top 25 high-volume-high-price surgical procedures to those of the Netherlands, for example, we would see savings of about $425 per capita, or a total of $137 billion.&#34;</em></p>
+<aside class="special"><p><em>&#34;If we in the United States could lower the prices and per-capita volumes of our CT scans, MRIs, and just the top 25 high-volume-high-price surgical procedures to those of the Netherlands, for example, we would see savings of about $425 per capita, or a total of $137 billion.&#34;</em></p>
 <p><a href="https://en.wikipedia.org/wiki/Ezekiel_Emanuel" target="_blank"><strong>Ezekiel Emanuel</strong></a><strong>, on an </strong><a href="https://jamanetwork.com/journals/jama/article-abstract/2674671" target="_blank"><strong>article published in JAMA, March 2018</strong></a></p>
 </aside>
-<h3 is-upgraded>Skip Ahead</h3>
-<p>This section has <em>lots</em> of background which explains <em>why</em> the <a href="https://www.cms.gov/Medicare/Medicare-Fee-for-Service-Payment/ClinicalLabFeeSched/PAMA-Regulations" target="_blank">PAMA</a> imaging use case was chosen for this exercise.  If you aren&#39;t interested in PAMA, and are here purely to learn the technology, you can skip ahead to the next section.  However, it might help to take at least <em>a few</em> minutes to skim this material, just to get the gist of what problem is being solved.</p>
-<h3 is-upgraded><strong>Warp</strong> Ahead</h3>
-<p>If you already have a good grasp of the SMART launch process, and you would like to do a lot more than <em>skip</em> ahead, you can <strong>warp</strong> ahead and begin the process at CDS Hooks implementation by checking out the code at <code>v2.0</code> in the repo and advancing to the section called <strong>Write a CDS Hooks Service</strong> in this codelab.</p>
-<p>There&#39;s another git tag, <code>v3.0</code>, for the <strong>final</strong> solution.  Check out this version of the code if you just want to play with a working copy of the app.  However, if you&#39;re here to learn, it is recommended that you find time to do the full codelab.</p>
 <h2 is-upgraded>PAMA Imaging</h2>
 <p>New PAMA imaging requirements are taking effect, starting on January 1st, 2020.  The American College of Radiology has put out some very helpful media to explain why this is important.</p>
 <ul>
@@ -122,7 +121,7 @@
 <p>By clicking on the ‘Update EHR&#39; button, the pending order will be modified to use whatever has been selected in the form.  The iframe will then close and return the user to the EHR order entry screen.</p>
 <h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
 <h3 is-upgraded>Which EHRs currently support the technologies required to enable these services?</h3>
-<aside class="special"><p>Currently, very <em>few</em> EHR vendors have implemented the required CDS Hooks or SMART Web Messaging to enable this (<em>T-Systems is a notable exception</em>).  Cerner has committed to doing this, though, and it&#39;s not a matter of if, but of when.  Epic is also ‘working on it.&#39;<br><br>While this may seem like a negative thing, the other way to see the situation is that any QCDSM vendor who is <em>ready</em> with product when CDS Hooks <em>does</em> become widespread will have the mover&#39;s advantage.  Also, there is currently relatively low pressure for an EHR vendor to get ‘caught up&#39; with competitors (but that should be changing rapidly in 2020).<br><br>In other words, there is still time for <em>everyone</em> to get ready!<br><br>For a list of vendors who support CDS Hooks, please refer to this:<br><a href="https://github.com/argonautproject/cds-hooks/wiki/Readiness-and-Testing-Matrix" target="_blank">https://github.com/argonautproject/cds-hooks/wiki/Readiness-and-Testing-Matrix</a></p>
+<aside class="special"><p>Currently, very <em>few</em> EHR vendors have implemented the required CDS Hooks or SMART Web Messaging to enable this (<a href="https://www.tsystem.com/" target="_blank"><em>T-System</em></a><em> is one notable exception</em>).  Cerner has committed to doing this, though, and it&#39;s not a matter of if, but of when.  Epic is also ‘working on it.&#39;<br><br>While this may seem like a negative thing, the other way to see the situation is that any QCDSM vendor who is <em>ready</em> with product when CDS Hooks <em>does</em> become widespread will have the mover&#39;s advantage.  Also, there is currently relatively low pressure for an EHR vendor to get ‘caught up&#39; with competitors (but that should be changing rapidly in 2020).<br><br>In other words, there is still time for <em>everyone</em> to get ready!<br><br>For a list of vendors who support CDS Hooks, please refer to this:<br><a href="https://github.com/argonautproject/cds-hooks/wiki/Readiness-and-Testing-Matrix" target="_blank">https://github.com/argonautproject/cds-hooks/wiki/Readiness-and-Testing-Matrix</a></p>
 </aside>
 
 
@@ -187,10 +186,10 @@ npm install
 <aside class="special"><p>To get you familiar with the app and how it works, please launch the app and use it to rate the following combinations of demographics.</p>
 <aside class="warning"><table>
 <tr></tr>
-<tr><td colspan="1" rowspan="1"><p>Age</p>
-</td><td colspan="1" rowspan="1"><p>Gender</p>
-</td><td colspan="1" rowspan="1"><p>Indication</p>
-</td><td colspan="1" rowspan="1"><p>Procedure</p>
+<tr><td colspan="1" rowspan="1"><p><strong>Age</strong></p>
+</td><td colspan="1" rowspan="1"><p><strong>Gender</strong></p>
+</td><td colspan="1" rowspan="1"><p><strong>Indication</strong></p>
+</td><td colspan="1" rowspan="1"><p><strong>Procedure</strong></p>
 </td></tr>
 <tr><td colspan="1" rowspan="1"><p>4</p>
 </td><td colspan="1" rowspan="1"><p>male</p>
@@ -233,14 +232,14 @@ npm install
 <aside class="warning"><p>It is time consuming, error-prone, and frustrating for providers when they have to switch focus to a browser window outside of the EHR, remember a URL so they can launch an external app, remember their correct username and password, and then enter patient demographic information to perform some basic task.<br></p>
 </aside>
 <h2 is-upgraded>Solution</h2>
-<aside class="special"><p>The SMART Launch Framework can dramatically improve the situation!<br><br>With the <a href="https://www.hl7.org/fhir/smart-app-launch/" target="_blank">SMART App Launch Framework</a>, the app will be able to securely read data from the EHR using the credentials of the clinician (through OAuth2 openid connect).  The provider will not need to remember a separate username and password to use the app anymore, and the app will be able to pre-load form fields using the available context in the EHR.<br><br>This will reduce user errors, save the user time, and spare them some frustrations.<br></p>
+<aside class="special"><p>The SMART Launch Framework can dramatically improve the situation!<br><br>With the <a href="https://www.hl7.org/fhir/smart-app-launch/" target="_blank">SMART App Launch Framework</a>, the app will be able to securely read data from the EHR through access delegation (OAuth 2) and single-sign-on (OpenID Connect).  The provider will not need to remember a separate username and password to use the app anymore, and the app will be able to pre-load form fields using the available context in the EHR.<br><br>This will reduce user errors, save the user time, and spare them some frustrations.<br></p>
 </aside>
 <h2 is-upgraded>SMART Launch Documentation</h2>
 <p>There is a very handy javascript library to enable easy configuration of SMART launches from the app.<br><a href="http://docs.smarthealthit.org/client-js/" target="_blank">http://docs.smarthealthit.org/client-js/</a></p>
 <h2 is-upgraded>EXERCISE 1</h2>
 <aside class="special"><p>Consult the link above, and create a <code>launch.html</code> endpoint.</p>
+<aside class="warning"><p><em>Confused?</em>  Part of the goal of this codelab is to get you familiar with using the documentation, so sometimes there will be minimal hand-holding.<br></p>
 </aside>
-<aside class="warning"><p><em>Confused?</em>  Part of the goal of this codelab is to get you familiar with using the documentation, so there will be minimal hand-holding throughout.</p>
 </aside>
 <p>Here are a couple of hints, in case this seems like a vague request.</p>
 <ul>
@@ -295,14 +294,14 @@ npm run launch
         <h2 is-upgraded>The SMART App Launcher</h2>
 <p>To test the new launch endpoint, we can use a free, open source tool called the SMART App Launcher.<br><a href="http://launch.smarthealthit.org/" target="_blank">http://launch.smarthealthit.org/</a></p>
 <h2 is-upgraded>EXERCISE</h2>
-<aside class="special"><p>Visit the site and enter the path to your <code>launch.html</code> endpoint.  Click the green Launch App button to test.</p>
+<aside class="special"><p>Visit the SMART App Launcher and enter the path to your <code>launch.html</code> endpoint.  Click the green Launch App button to test.</p>
 </aside>
 <p>If it worked correctly, you should see the app launched within a mock EHR session and you should not have been prompted to enter a username and password.  You should have been prompted to pick a provider and also pick a patient.</p>
-<p class="image-container"><img alt="provider picker" src="img/84e323c46d9e569e.png"></p>
-<p class="image-container"><img alt="patient picker" src="img/26986307fb35c83a.png"></p>
-<p class="image-container"><img alt="launched" src="img/620f529c8692d468.png"></p>
+<p class="image-container"><img alt="provider picker" src="img/a628e28fe4f00c04.png"></p>
+<p class="image-container"><img alt="patient picker" src="img/cf0e5bfb21f8f84c.png"></p>
+<p class="image-container"><img alt="launched" src="img/99423e65cf237697.png"></p>
 <h3 is-upgraded>Notice</h3>
-<p>If you had configured your launch URL to have a pre-selected patient, you would not have seen the patient picker and the patient name listed at the top and bottom edges of the Simulated EHR would have been filled in automatically using that patient; however, the age and gender would not automatically be populated in the form fields.  We must first modify the HTML to do that, which will happen in the next section.</p>
+<p>If you had configured your launch URL to have a pre-selected patient, you would not have seen the patient picker; instead, the patient name listed at the top and bottom edges of the Simulated EHR would have been filled in automatically using that patient. However, the age and gender would not automatically be populated in the form fields.  We must first modify the HTML to do that, which will happen in the next section.</p>
 <h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
 <h3 is-upgraded>I only see a white screen within the Simulated EHR panel.</h3>
 <aside class="warning"><p>You may have visited <a href="https://launch.smarthealthit.org/" target="_blank">https://launch.smarthealthit.org/</a> instead of <a href="http://launch.smarthealthit.org/" target="_blank">http://launch.smarthealthit.org/</a>.  Notice the difference is <code>http</code> versus <code>https</code>.  Try again using <code>http</code> to visit the smart launcher.</p>
@@ -314,7 +313,7 @@ npm run launch
 <aside class="warning"><p>Be sure your launch URL includes the full <code>launch.html</code> portion, and not just a path to the webserver root.</p>
 </aside>
 <h3 is-upgraded>I was not prompted to select either a patient or a provider.</h3>
-<aside class="warning"><p>Be sure your launch URL includes the full <code>launch.html</code> portion, and not just a path to the webserver root.  Also confirm that you&#39;re running the <code>v1.0</code> branch of the code (not <code>master</code> or <code>v2.0</code>).</p>
+<aside class="warning"><p>Be sure your launch URL includes the full <code>launch.html</code> portion, and not just a path to the webserver root.  Also confirm that you&#39;re running the <code>v1.0</code> tag of the code (not <code>master</code> or <code>v2.0</code>).</p>
 </aside>
 
 
@@ -422,11 +421,10 @@ npm run launch
 <p>You may view the solution in <a href="https://github.com/microsoft-healthcare-madison/demo-auc-app/commit/dc28f441558ede38a7464483d2596f2f0e6b07ea#diff-eacf331f0ffc35d4b482f1d15a887d3b" target="_blank">this PR</a>.<br></p>
 </aside>
 <h2 is-upgraded>EXERCISE 2</h2>
-<aside class="special"><p>Confirm that your changes work by SMART-launching the app from the SMART App Launch portal.  You will know you are complete when the form fields are automatically updated to match the patient you select in the patient picker.</p>
+<aside class="special"><p>Confirm that your changes work by SMART-launching the app from the SMART App Launch portal.  You will know you are complete when the form fields are automatically updated to match the patient you select in the patient picker.<br><br>Confirm in the javascript console that there are no errors or stray messages.</p>
 </aside>
 <h2 is-upgraded>EXERCISE 3 (BONUS)</h2>
-<aside class="special"><p>Now that the app is capable of a SMART Launch, you can remove lots of the session / authentication logic in <code>index.js</code> to simplify things.</p>
-<p>Remove the legacy login and authentication code from the existing <code>index.js</code> script.</p>
+<aside class="special"><p>Now that the app is capable of a SMART Launch, you can remove lots of the session / authentication logic in <code>index.js</code> to simplify things.<br><br>Remove the legacy login and authentication code from the existing <code>index.js</code> script.</p>
 </aside>
 <h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
 <h3 is-upgraded>TODO: populate these as they are asked</h3>
@@ -438,7 +436,7 @@ npm run launch
     
       <google-codelab-step label="Write a CDS Hooks Service" duration="90">
         <h2 is-upgraded>Problem</h2>
-<aside class="warning"><p>While it&#39;s true that we have improved the situation greatly by giving the app the ability to SMART Launch, we still have not addressed the concern that the provider needs to leave the EHR in order to use the app (after remembering how to find it).<br><br>We also would like to provide a helpful signal to the user whenever it is appropriate to use the app, reducing the chance that the user will forget to consult the app before ordering advanced diagnostic medical imaging.<br></p>
+<aside class="warning"><p>While we have improved the app login situation <em>greatly</em> by giving the app the ability to SMART Launch, we still have not addressed the concern that the provider needs to specifically remember <em>when</em> to use this app.  Without contextual reminders, a guidelines app us unlikely to see widespread adoption within the ordering workflow for advanced diagnostic medical imaging.<br></p>
 </aside>
 <h2 is-upgraded>Solution</h2>
 <aside class="special"><p>Write a CDS Hooks service which will signal the user <em>inside the EHR order entry screen</em> to use the app <em>when needed</em>, and <em>provide a helpful link</em> to make it painless to SMART Launch the app.</p>
@@ -453,16 +451,16 @@ npm run launch
 <li>Swagger API Definition: <a href="http://editor.swagger.io/?url=https://raw.githubusercontent.com/cds-hooks/api/master/cds-hooks.yaml" target="_blank">http://editor.swagger.io/?url=https://raw.githubusercontent.com/cds-hooks/api/master/cds-hooks.yaml</a></li>
 </ul>
 <h2 is-upgraded>CDS Hooks Overview</h2>
-<p>Taken from: <a href="http://cds-hooks.org/" target="_blank">http://cds-hooks.org/</a><img alt="cds-hooks" src="img/176dc1103938ab93.png"></p>
+<p>Taken from: <a href="https://cds-hooks.org/" target="_blank">https://cds-hooks.org/</a><img alt="cds-hooks" src="img/176dc1103938ab93.png"></p>
 <p>If you follow the overall flow of CDS Hooks in the diagram above, you can see how the EHR and the CDS Hooks service work together.  But how does the EHR <em>know</em> about the CDS Hooks service?</p>
 
 
       </google-codelab-step>
     
       <google-codelab-step label="CDS Hooks Discovery Endpoint" duration="20">
-        <p>There will be several important concepts of CDS Hooks that need to be understood to make this service work as intended.  The most logical starting-place, though, is the <a href="https://github.com/cerner/cds-services-tutorial/wiki/Discovery-Endpoint" target="_blank">CDS Hooks discovery endpoint</a>.</p>
+        <p>You must understand <strong>several</strong> CDS Hooks concepts to make this service work as intended; however, the most logical starting-place is the <a href="https://github.com/cerner/cds-services-tutorial/wiki/Discovery-Endpoint" target="_blank">CDS Hooks discovery endpoint</a>.</p>
 <h2 is-upgraded>Discovery</h2>
-<p>To run a CDS Hooks service, that service must provide a discovery endpoint which describes all the CDS Hooks that your service is interested in.  In this case, we want our service to be posted-to whenever the <code>order-select</code> hook in the EHR is activated.  This will allow the service to process the current order selection and return the desired ‘card&#39; data (which is then displayed by the EHR to the provider).</p>
+<p>To run a CDS Hooks service, that service must provide a discovery endpoint which describes all the CDS Hooks that your service is interested in.  In this case, we want the EHR to post a message to our service whenever the <code>order-select</code> hook is activated.  This will allow the service to process the <em>currently pending</em> order selection and return the desired ‘card&#39; data (which is then displayed by the EHR to the provider).</p>
 <h3 is-upgraded>Documentation</h3>
 <p>You can read more details about the <code>order-select</code> hook here: <a href="https://cds-hooks.org/hooks/order-select/" target="_blank">https://cds-hooks.org/hooks/order-select/</a></p>
 <h2 is-upgraded>EXERCISE</h2>
@@ -509,8 +507,9 @@ app.get(&#39;/cds-services&#39;, function(request, response) {
 <h2 is-upgraded>EXERCISE 1</h2>
 <aside class="special"><p><strong>Instructions</strong></p>
 <ul>
-<li>Select the PAMA Imaging tab, if not already selected.</li>
-<li>Enter the number <code>72133</code> in the ‘Search orders&#39; box.  This is a CPT procedure code.</li>
+<li>Launch the sandbox: <a href="http://sandbox.cds-hooks.org" target="_blank">http://sandbox.cds-hooks.org</a></li>
+<li>Select the <strong>PAMA Imaging</strong> tab, if not already selected.</li>
+<li>Enter the number <code>72133</code> in the ‘Search orders&#39; box.  This is a CPT procedure code for lumbar spine CT.</li>
 <li>Select the auto-suggested ‘CT, lumbar spine&#39; order, which should be the only suggestion.</li>
 <li>Enter <code>low back pain</code> in the ‘Search reasons&#39; box and select the top result.</li>
 <li>In the CDS Developer Panel on the right, select the <code>pama-imaging</code> service if not already selected.</li>
@@ -524,24 +523,25 @@ app.get(&#39;/cds-services&#39;, function(request, response) {
 <ul>
 <li>Delete the selected order and reason, if any are selected.</li>
 <li>Type <code>congenital heart</code> into the ‘Search reasons&#39; box and select the top suggestion.</li>
-<li>Notice how a card has appeared on the left side of the screen.</li>
+<li>Notice how a card has appeared on the lower left side of the screen.</li>
 <li>Select the <code>pama-imaging</code> service from the drop-down on the right, if not already selected.</li>
 <li>Observe the structure of the Card definition within the <code>Response</code> message in the CDS Developer Panel.  This card was generated <em>by</em> the <code>pama-imaging</code> CDS service, which is running remotely at <a href="https://fhir-org-cds-services.appspot.com" target="_blank">https://fhir-org-cds-services.appspot.com</a>.</li>
 </ul>
 </aside>
 <h2 is-upgraded>EXERCISE 3</h2>
-<aside class="special"><p>See if you can discover the complete list of CDS Services at <a href="https://fhir-org-cds-services.appspot.com" target="_blank">https://fhir-org-cds-services.appspot.com</a> by modifying the URL (or adding something to it).</p>
+<aside class="special"><p>See if you can discover the complete list of CDS Services at <a href="https://fhir-org-cds-services.appspot.com" target="_blank">https://fhir-org-cds-services.appspot.com</a> by modifying the URL above (hint: try <em>adding</em> something to it).</p>
 </aside>
 <h2 is-upgraded>EXERCISE 4</h2>
 <aside class="special"><p><strong>Instructions</strong></p>
 <ul>
 <li>Configure the CDS Hooks Sandbox to use your local CDS Hooks service by providing it with your discovery endpoint (which should be somewhere on <code>http://localhost</code>).</li>
 <li>Change the selected service in the CDS Developer Panel to your new service, which should apear as <code>demo-auc-app</code>.</li>
+<li>Notice that the sandbox is now sending CDS Hook events to your local service <strong>and</strong> the default remote ones.</li>
 </ul>
 </aside>
 <h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
-<h3 is-upgraded>TODO: populate these as they are asked</h3>
-<aside class="warning"><p>Please ask questions as you think of them!</p>
+<h3 is-upgraded>EXERCISE 2 - After selecting the top suggestion for <code>congenital heart</code> - I didn&#39;t see a card appear.</h3>
+<aside class="warning"><p>Be sure you entered <code>congenital heart</code> in the <strong>Reasons</strong> box, and not in the <strong>Orders</strong> box.</p>
 </aside>
 
 
@@ -549,10 +549,10 @@ app.get(&#39;/cds-services&#39;, function(request, response) {
     
       <google-codelab-step label="AUC Logic" duration="20">
         <h2 is-upgraded>Problem</h2>
-<aside class="warning"><p>We want the user to be visually alerted in the EHR when they have selected an order where AUC guidelines should be consulted while ordering.  For this to work, the CDS Hooks service must be able to evaluate the pending order against AUC guidelines, so a card of the appropriate severity can be displayed.  However, the logic is all currently available in a separate service.</p>
+<aside class="warning"><p>We want the user to be visually alerted in the EHR when they have selected an order where AUC guidelines should be consulted <em>while</em> ordering.  For this to work, the CDS Hooks service must be able to evaluate the <em>draft</em> order against AUC guidelines, so a card of the appropriate severity can be displayed.  However, the AUC logic is all currently available in a separate service.</p>
 </aside>
 <h2 is-upgraded>Solution</h2>
-<aside class="special"><p>We will extract the AUC logic from the other service, making it available as a module to the CDS Hooks service.  Alternatively, if the app had provided an API, the CDS Hooks service could use that API as order items are selected to determine appropriateness.  Either works, but in this case the logic is easy enough to isolate as a module.</p>
+<aside class="special"><p>We will extract the AUC logic from the other service, making it available as a <em>module</em> to the CDS Hooks service.  Alternatively, if the app had provided an API, the CDS Hooks service could use that API as draft order items are selected to determine appropriateness.  Either works, but in this case the logic is easy enough to isolate as a module.</p>
 </aside>
 <h2 is-upgraded><code>auc.js</code></h2>
 <p>The following can be loaded by both the app and the CDS Hooks service to determine the appropriateness rating of an order / diagnosis combination.</p>
@@ -634,11 +634,11 @@ module.exports = {
 <li>Import the module in your CDS Hooks service (a la <code>const auc = require(&#39;./auc.js&#39;);</code>).</li>
 <li>Use the imported functionality to determine which appropriate-ness score the current selection has using the currently-selected orders and diagnoses.</li>
 </ul>
+<aside class="warning"><p>You may struggle here a bit learning how to extract the currently selected order and diagnosis from the current Request message.  Remember that the CDS Developer Panel in the sandbox UI is your friend.  Also, take advantage of the javascript developer console for quick debugging.</p>
 </aside>
-<aside class="warning"><p>You may struggle here a bit learning how to extract the currently selected order and diagnosis from the current Request message.  Remember that the CDS Developer Panel in the sandbox UI is your friend.</p>
 </aside>
-<h2 is-upgraded>EXERCISE 2 (OPTIONAL)</h2>
-<aside class="special"><p>Refactor the old service to remove the AUC logic from it, replacing it with a module import of the new <code>auc.js</code> code.</p>
+<h2 is-upgraded>EXERCISE 2 (BONUS)</h2>
+<aside class="special"><p>Refactor the old service (in <code>index.js</code>) to remove the AUC logic from it, replacing it with a module import of the new <code>auc.js</code> code.  This should <em>dramatically</em> reduce the code complexity.</p>
 </aside>
 
 
@@ -646,7 +646,7 @@ module.exports = {
     
       <google-codelab-step label="Playing with Cards" duration="20">
         <h2 is-upgraded>Problem</h2>
-<aside class="warning"><p>We want the EHR interface to display a card based on selection.  Also, when the current selection is outside of guideline recommendations, the displayed card should be eye-catching.  When the selection is <em>within</em> guidelines, it should be recognizable as ‘good&#39;.</p>
+<aside class="warning"><p>We want the EHR order entry screen to display an eye-catching card based on the current selection.  Also, when the selection is <em>outside</em> of guideline recommendations, the displayed card should be especially eye-catching.  When the selection is <em>within</em> guidelines, it should clearly and pleasantly be recognizable as ‘good&#39;.</p>
 </aside>
 <h2 is-upgraded>Solution</h2>
 <aside class="special"><p>We&#39;ll implement the cards to change their displayed icon and border color using varying levels of card type.</p>
@@ -663,28 +663,30 @@ module.exports = {
 </ul>
 <h2 is-upgraded>A Head Start</h2>
 <p>The following code snippet will help you get started matching the look of the intended output.</p>
-<pre><code>const cardDetails = {
+<p>Insert it into your CDS Hooks service code.  With that in place, all you have to do is map <code>appripriate</code> (or the other ratings) to the custom card attributes needed to render the desired cards (some other <em>generic</em> attributes may also be needed, too).</p>
+<pre><code>const images = &#39;https://github.com/microsoft-healthcare-madison/demo-auc-app/tree/master/images/&#39;;
+const cardDetails = {
   &#39;appropriate&#39;: {
     detail: &#39;This order meets AUC guidelines.&#39;,
-    icon: &#39;https://lh3.googleusercontent.com/bYNztCIytfV24Hzu9O11XcMhcHdcjRbX0TX2JfxX_LN-tKOOvqQi1lAhmBv7hY8UbMBmshW9vq3jFMO5kbCbq4fTsSWmlccsknxRvtGNunP_IktjIAn38prInj-6f6qWcTk3A9C3kkkJIilgeWOeOy3j8rifvViasCyhm5AGxeBs0TwyLIS-rV7LJDEWI9PjhTPcalYmvZBpl5Yti073BFHlBdMQH98D4CLQle9ZOR8zvXs43NGQdDFRk6QYplv7WFy6veT8b_sGeGxssvPVQoL9Kzcdagd1ftrvsY9vEzm9U79x4u9sBH_kw-BjyJilBh3ZLcTISbuSN-zT3Xn77uOh-aIemSKnr7jl33Ex3i0JyqxMcmj1Wc7cH4sCEHJ7bku3yZYndzVZgjvyPOV44EWo5OyDNVdQ22Hv4LbbSGQku0NCiSbm8g17rb3agKRnjmgioe6kWpa4lH16Q80FuRmAyYZ0GbBJl407qRrmMN-oO9R_LnzIABoV8BPyfU4BvsTDO_GZMBlaoy2K1Qv-0RL9faAjpN6iNQdofpJ28qn07MjJM-vHqPyD3U-eA8RgpSsofQscgE57GrSDDLRhgev3iyhhu2XU4pHbvmd4UUf82a2W0_OYkOlkeiTXM_YdrrW7E2Zpp2pWoIhZJIgXAVuaIz4v6k6EREPeBUuYiAoJHNs-UNXg3cvz=s100-no&#39;,
+    icon: images + &#39;appropriate.png&#39;,
     indicator: &#39;success&#39;,
   },
   &#39;no-guidelines-apply&#39;: {
     detail: &#39;This order is not specified by AUC guidelines.&#39;,
-    icon: &#39;https://lh3.googleusercontent.com/fLQElMed2CFqAHxwRlIe5gJoHp9PFyZUPEcjgdB2Jj2dL7tHKfg4potyo39gsQeP_6wQ7zkWXaMGR7KnfkDrW1ks0jYaHmMdFi-AUer53CQCkKBwkgIEtgRSlozLDqiqpTBMIGRfsj_6oYtruy8O1cFEI54xSjXGtC3l3HThdk93lOjwbxdmqshbkYvm1XYTNcJuBQBdYgIEJusjX_RDBTvJiAxQ0lBeYSHjGBE8JibvQjLboSqNwefLVbIZ24LUenGoub9Y8mhVlxUeQMQPYclnn5W5Nj509L0Oc65ZAvLhoqAJs_sI6gr7ViJqkgdGfRe2pAXbikX2vBvLRHMktcGD5J_YVYTst5vrvfnhfhE0P-kPSp4XLt4WrfP5OQe7lysg-EFyiK6F7REP7NmiPy8x8hf9O9GuUoPFqXwU4psdoXbuNpCsuPA6tfnU6QwC-vUvzOWJgF1bMpu8NimhqPrOgBAUAHh0eVh9p3_ix8OwKBZ70EX8a7E9mq67k0-rTtMoElwBkFNzArTsMd1xp6QboF0F-oV_Li7xje_7Fokn-nDbB72ULX9K-MVbSkZvhD7Y_hJwQPG6wWF4kHaX_zzZsdD5botGT2VMrF-wGklzRrh2bBS-jT12IAeBECGgO_XKOu3Ire3WQ0SUdYGpE5Ebs4KrWAOykznsL9OqfkVuD1SIwjKgR-A2=s100-no&#39;,
+    icon: images + &#39;no-guidelines-apply.png&#39;,
     indicator: &#39;warning&#39;
   },
   &#39;not-appropriate&#39;: {
     detail: &#39;This order does not meet AUC guidelines.&#39;,
-    icon: &#39;https://lh3.googleusercontent.com/6f3-twVm-TIZr0IWsb4Yuiys58PkeV3RU89XSDjRtV2beBiKxsoSg4-7qNgzLkZZf-Vy-1OoG5pswPQSK8XRuW3lE56wQgkItirK-iBozZMoD5JvcOR6ZxusPjrvMOE-iwaOKYZxnk0qyoDu7W4WQfaTDaGXAL26OuV_VBIxL0SSXzONWCrk70ckTJPzGy7detQTWknOZJNLuLEv0N45q_EoOu6SLgUlf3woVe-zm0JMNV68JsXH5FIlRwidaplY19MnY40If0fGtQkvnrNS4lwZ9pnx_PK_wiTJhhnpfuNRvrhy_Bdphsy_CN0fMj2FfrwhOJl48jlg8IvIkMzDMlEZGthzryIhN2B-94Eq2oNZS9JaAixqLg2P06_HcaVWMi5x6slPMCal_sU78yuta5lNZdxS7XYw9xJWLjW8Mu_LPKoA6m0onGcYLnwYkdXLFvqdF4dWKYOx1uFvPAMOsucST4orXqVTFWFiEm39et-ZUVOArLm9yXh8i4zl5PKTs4sA7c4u8CLwLyW04Unkg59KnL0ZNKX0xRNm052pW_WhX2g48oKjPIqnQ6Zl1omgNgzIyHo2mvpIKstENpGJwsIqNO456kWEbgUmydTZn40d-VdG47d5Xg5R0jl-WGrK_FbG8u0DupeeCE9kRo2GTrqUuVZWOPZnHJqLnJRWsvEdybsWqC5_m8Fz=s100-no&#39;,
+    icon: images + &#39;not-appropriate.png&#39;,
     indicator: &#39;critical&#39;,
   },
 };
 </code></pre>
 <h2 is-upgraded>EXERCISE 1</h2>
 <aside class="special"><p>Using the appropriate-ness rating from the previous exercise, have your service return a list of cards that use the intended icon, detail, and indicator.  DO NOT worry about creating the app link in this exercise!</p>
+<aside class="warning"><p>Again, remember that the CDS Developer Panel is your friend.  Also, remember that when you enter <code>Congenital heart disease</code> as a ‘Reason&#39; - the <code>pama-imaging</code> service will return a card.  You can quickly switch the selected service in the CDS Developer Panel to see what the Response payload looks like while developing your own service.<br><br>Also, you can <em>disable</em> the <code>pama-imaging</code> service in the sandbox if you prefer to only see the card returned by your service.<br></p>
 </aside>
-<aside class="warning"><p>Again, remember that the CDS Developer Panel is your friend.  Also, remember that when you enter <code>Congenital heart disease</code> as a ‘Reason&#39; - the <code>pama-imaging</code> service will return a card.  You can quickly switch the selected service in the CDS Developer Panel to see what the Response payload looks like while developing your own service.</p>
 </aside>
 <h2 is-upgraded>EXERCISE 2</h2>
 <aside class="special"><p>Add the following snippet to your generated cards.  This will provide a SMART link to launch your SMART app.</p>
@@ -694,8 +696,8 @@ module.exports = {
   type: &#39;smart&#39;
 }],
 </code></pre>
+<aside class="warning"><p>The links, as shown above, should be able to launch the app - but they still don&#39;t demonstrate how EHR data is <strong>passed</strong> to the external app.  There&#39;s a missing step that we&#39;ll get to in another section (soon, though).</p>
 </aside>
-<aside class="warning"><p>The links, as shown above, should be able to launch the app - but they still don&#39;t demonstrate how EHR data is passed to the external app.  There&#39;s a missing step that we&#39;ll get to in another section (soon, though).</p>
 </aside>
 <h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
 <h3 is-upgraded>TODO: populate these as they are asked</h3>
@@ -716,11 +718,43 @@ module.exports = {
 <ul>
 <li><a href="https://cds-hooks.hl7.org/ballots/2018May/specification/1.0/#link" target="_blank">https://cds-hooks.hl7.org/ballots/2018May/specification/1.0/#link</a></li>
 </ul>
+<p>Spend a few minutes reading the documentation to get a feel for how the <code>appContext</code> attribute can be added to the links in the CDS Hooks service.</p>
 <h2 is-upgraded>EXERCISE 1</h2>
 <aside class="special"><p>Add an <code>appContext: {message: &#39;Hello, world!&#39;}</code> field to your card links, just to test that it can be received on the client side.</p>
 </aside>
 <h2 is-upgraded>EXERCISE 2</h2>
 <aside class="special"><p>In the <code>index.html</code> code, confirm that the <code>appContext.message</code> value is being received upon SMART launch.  One way to do this is by using the javascript console.  Alternatively, you can insert the message into the rendered HTML temporarily.  However you prefer - please confirm that the data passed through <code>appContext</code> is received on the other end!</p>
+</aside>
+<h2 is-upgraded>EXERCISE 3</h2>
+<aside class="special"><p>Serialize the data fields that are needed to populate the form selections in the app, namely, the selected Order and Diagnosis.  Confirm that they are being received upon SMART launch.<br></p>
+</aside>
+<h2 is-upgraded>EXERCISE 4</h2>
+<aside class="special"><p>Modify your code in <code>index.html</code> so that the <code>getContext</code> function returns a context object containing an <code>indication</code> and an <code>order</code>, which will be used to populate the selected form <code>&lt;input&gt;</code> values.</p>
+<pre><code>// File: index.html
+...
+async function getContext(client) {
+  const appContextStr = &#39;TODO - read from the client appContext&#39;;
+  appContext = JSON.parse(appContextStr);
+  const indications = appContext.indications || [-1];
+  const orders = appContext.orders || [-1];
+  return {
+    indication: indications.pop() || -1,
+    order: orders.pop() || -1,
+    patient: await client.patient.read(),
+    user: await client.user.read(),
+  };
+}
+
+function populateForm(context) {
+  ...
+  if (context.indication !== -1) {
+    document.getElementById(&#39;indications&#39;).value = context.indication;
+  }
+  if (context.order !== -1) {
+    document.getElementById(&#39;procedures&#39;).value = context.order;
+  }
+}
+</code></pre>
 </aside>
 <h2 class="faq" is-upgraded>Frequently Asked Questions</h2>
 <h3 is-upgraded>TODO: populate these as they are asked</h3>
@@ -731,11 +765,30 @@ module.exports = {
       </google-codelab-step>
     
       <google-codelab-step label="SMART Web Messaging" duration="60">
-        <p>Outline</p>
+        <h2 is-upgraded>Problem</h2>
+<aside class="warning"><p>We&#39;ve done a great job launching the app from the EHR, complete with all the relevant context available to us.  However, any changes we make to the form will not automatically apply to the EHR selections, so the user will have to remember what she did and re-create that work after closing the app.  This is still far from ideal.<br></p>
+</aside>
+<h2 is-upgraded>Solution</h2>
+<aside class="special"><p>We will enable the app to update the EHR selection by providing a new ‘update&#39; button.  We&#39;ll also provide a ‘cancel&#39; button.<br></p>
+</aside>
+<h2 is-upgraded>Design</h2>
+<p>Recall the new app features from the codelab introduction</p>
+<p class="image-container"><img alt="embedded-app" src="img/d305f11b4c68b4d7.png"></p>
+<p>In the final remaining sections of this codelab, you will implement several exercised to complete the missing functionality.</p>
+<h2 is-upgraded>Missing Functionality</h2>
 <ul>
-<li>TODO: introduce the design goals (show pictures of the wanted UI).</li>
+<li>The app needs to be able to inform the EHR that it is ‘all done&#39; so the EHR knows it can close the iframe used to embed the app.  This is essentially how the ‘cancel&#39; button is implemented.</li>
+<li>The app needs to be able to update the current pending order based on whatever form values have been selected.  When a final selection has been made, the user will click the ‘update&#39; button to update the EHR and close the app.</li>
+<li>Because the app currently uses a form to POST to a remote service for determining AUC appropriateness, it becomes awkward when trying to implement functionality that will allow the user to ‘test out&#39; various changes to order and diagnosis before updating the EHR.  So, ideally, instead of POST&#39;ing to a remote service, the form can invoke a javascript <em>function</em> which will take advantage of the new <code>auc.js</code> module.</li>
+</ul>
+<h2 is-upgraded>Reference</h2>
+<p>Please refer to the SMART Web Messaging docs: <a href="https://github.com/smart-on-fhir/smart-web-messaging" target="_blank">https://github.com/smart-on-fhir/smart-web-messaging</a></p>
+<h2 is-upgraded>EXERCISE 1</h2>
+<aside class="special"><p>Find in the docs the changes to the requested scopes that will be necessary to complete the missing functionality.</p>
+</aside>
+<p>Outline</p>
+<ul>
 <li>TODO: link to the documentation.<br><a href="https://github.com/smart-on-fhir/smart-web-messaging" target="_blank">https://github.com/smart-on-fhir/smart-web-messaging</a></li>
-<li>TODO: Provide the code to update the html using the client context</li>
 <li>TODO: Link to the SMART Web Messaging docs</li>
 <li>EXERCISE: Ask user to implement the closeApp function using window.postMessage</li>
 <li>TODO: provide the code to apply auc logic to the form (the Evaluate button)</li>
