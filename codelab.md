@@ -209,7 +209,7 @@ To begin this codelab, begin by cloning the repository *at* the initial version,
 ```bash
 mkdir ~/codelab
 cd ~/codelab
-git clone --branch v1.0 git@github.com:microsoft-healthcare-madison/demo-auc-app.git
+git clone --branch v1.0 https://github.com/microsoft-healthcare-madison/demo-auc-app.git
 cd demo-auc-app
 npm install
 ```
