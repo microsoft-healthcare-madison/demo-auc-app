@@ -619,7 +619,7 @@ Negative
 ## CDS Hooks Testing
 Duration: 20
 
-To test and develop your CDS Hooks service, it's recommended to use one of the several freely available sandboxes.  One of the easiest to use is: <https://sandbox.cds-hooks.org/>.
+To test and develop your CDS Hooks service, it's recommended to use one of the several freely available sandboxes.  One of the easiest to use is: <http://sandbox.cds-hooks.org/>.
 
 ![cds-hooks-sandbox](images/v3_pama_tab.png)
 
